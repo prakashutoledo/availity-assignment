@@ -6,6 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 import spock.lang.Specification
 import spock.lang.Unroll
 
+/**
+ * Spock specification for {@Link LispParenthesisValidator}
+ *
+ * @author Prakash Khadka <br>
+ *         Created on: May 10, 2022
+ */
 class LispParenthesisValidatorTest extends Specification {
 
     @Unroll
@@ -34,7 +40,7 @@ class LispParenthesisValidatorTest extends Specification {
             """.stripIndent().stripMargin()                           | _
             '(or (and "zero" nil "never") "James" \'task \'time)'     | _
             '((lambda (arg) (+ arg 1)) 5)'                            | _
-            '(setf (fdefinition \'f) #\'(lambda (a) (block f b...)))' | _
+            "(setf (fdefinition 'f) #'(lambda (a) (block f b...)))"   | _
             """|(let ((stuff (should-be-constant)))                   
                |(setf (third stuff) 'bizarre)) 
             """.stripIndent().stripMargin()                           | _
@@ -70,18 +76,21 @@ class LispParenthesisValidatorTest extends Specification {
             assertFalse validationResult, "Invalid parenthesis"
 
         where: 'Input expression are'
-        expression | _
-        '('                                        | _
-        '(()'                                      | _
-        '#|  '                                     | _
-        '#|   \n'                                  | _
-        "(reduce #'-"                              | _
-        """|(reduce #'-
-           |    reverse (list 1 2 3)))
-        """.stripMargin().stripIndent()            | _
-        """|#|
-           |(reduce #'-
-           |    (reverse (list 1 2 3)))
-        """.stripIndent().stripMargin()            | _
+            expression | _
+            null                                       | _
+            ''                                         | _
+            '   '                                      | _
+            '('                                        | _
+            '(()'                                      | _
+            '#|  '                                     | _
+            '#|   \n'                                  | _
+            "(reduce #'-"                              | _
+            """|(reduce #'-
+               |    reverse (list 1 2 3)))
+            """.stripMargin().stripIndent()            | _
+            """|#|
+               |(reduce #'-
+               |    (reverse (list 1 2 3)))
+            """.stripIndent().stripMargin()            | _
     }
 }

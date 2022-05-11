@@ -6,7 +6,7 @@ import java.util.Stack;
  * Validator for Lisp code parenthesis
  *
  * @author Prakash Khadka <br>
- *         Created on: Jan 30, 2022
+ *         Created on: May 10, 2022
  */
 public class LispParenthesisValidator {
     private static final LispParenthesisValidator VALIDATOR = new LispParenthesisValidator();
@@ -48,7 +48,7 @@ public class LispParenthesisValidator {
      * @return {@code true} if closed and nested otherwise {@code false}
      */
     private boolean test(String expression) {
-        if (expression == null || expression.isEmpty()) {
+        if (expression == null || expression.isBlank()) {
             return false;
         }
 

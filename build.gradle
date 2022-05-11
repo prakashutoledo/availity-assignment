@@ -1,9 +1,7 @@
-
 buildscript {
     ext {
-        spockBomVersion = '2.1-M2-groovy-3.0'
+        spockBomVersion = '2.1-groovy-3.0'
         dependencyManagementPluginVersion = '1.0.11.RELEASE'
-        modulePluginVersion = '1.8.10'
     }
 }
 
