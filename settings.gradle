@@ -1,0 +1,12 @@
+pluginManagement {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+
+        mavenCentral()
+    }
+}
+
+include 'lisp-parenthesis-validator'
+rootProject.name = 'availity-assignment'
