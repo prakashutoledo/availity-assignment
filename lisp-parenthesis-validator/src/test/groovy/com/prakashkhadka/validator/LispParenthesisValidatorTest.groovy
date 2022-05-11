@@ -76,7 +76,7 @@ class LispParenthesisValidatorTest extends Specification {
             assertFalse validationResult, "Invalid parenthesis"
 
         where: 'Input expression are'
-            expression | _
+            expression                                 | _
             null                                       | _
             ''                                         | _
             '   '                                      | _
