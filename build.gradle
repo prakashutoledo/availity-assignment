@@ -2,12 +2,15 @@ buildscript {
     ext {
         spockBomVersion = '2.1-groovy-3.0'
         jacksonBomVersion= '2.13.2'
+
         dependencyManagementPluginVersion = '1.0.11.RELEASE'
+        modulePluginVersion = '1.8.10'
     }
 }
 
 plugins {
     id 'io.spring.dependency-management' version "${dependencyManagementPluginVersion}" apply false
+    id 'org.javamodularity.moduleplugin' version "${modulePluginVersion}" apply false
 }
 
 allprojects {
@@ -17,6 +20,7 @@ allprojects {
 afterEvaluate {
     subprojects {
         apply plugin: 'io.spring.dependency-management'
+        apply plugin: 'org.javamodularity.moduleplugin'
 
         repositories {
             mavenCentral()
@@ -39,6 +43,9 @@ afterEvaluate {
         }
 
         test {
+            moduleOptions {
+                runOnClasspath = true
+            }
             useJUnitPlatform()
             testLogging {
                 events 'passed', 'skipped', 'failed'
