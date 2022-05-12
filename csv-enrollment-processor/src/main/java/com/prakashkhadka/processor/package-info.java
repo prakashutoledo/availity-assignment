@@ -1,5 +1,5 @@
 /**
- * Package 'com.prakashkhadka.processor.domain' which is
+ * Package 'com.prakashkhadka.processor' which is
  * is exported into module 'availity.assignment.csv.enrollment.processor'
  *
  * @author Prakash Khadka <br>

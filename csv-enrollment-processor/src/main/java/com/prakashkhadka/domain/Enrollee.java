@@ -1,4 +1,4 @@
-package com.prakashkhadka.processor.domain;
+package com.prakashkhadka.domain;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
