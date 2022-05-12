@@ -15,7 +15,7 @@ import spock.lang.Unroll
 class LispParenthesisValidatorTest extends Specification {
 
     @Unroll
-    def 'Input lisp code `#expression` has valid parenthesis because of `#validationSuccessReason`'() {
+    def 'Input lisp code \n#expression\nhas valid parenthesis because of `#validationSuccessReason`'() {
         when: 'Lisp code expression are validated'
             def validation = LispParenthesisValidator.validate expression
 
@@ -33,17 +33,17 @@ class LispParenthesisValidatorTest extends Specification {
             """|#|
                |;(mapcar #'+ '(1 2 3 4 5) '(10 20 30 40 50))"
                ||#
-            """.stripIndent().stripMargin()                         || 'Valid Lisp multiline comment (expression inside is ignored)'
+            """.stripIndent().stripMargin().trim()                  || 'Valid Lisp multiline comment (expression inside is ignored)'
             """|(defun factorial (n)
                |    (if (zerop n) 1
                |        (* n (factorial (1- n)))))
-            """.stripIndent().stripMargin()                         || 'Valid Lisp code with parenthesis closed and enclosed'
+            """.stripIndent().stripMargin().trim()                  || 'Valid Lisp code with parenthesis closed and enclosed'
             '(or (and "zero" nil "never") "James" \'task \'time)'   || 'Valid Lisp code with parenthesis closed and enclosed'
             '((lambda (arg) (+ arg 1)) 5)'                          || 'Valid Lisp code with parenthesis closed and enclosed'
             "(setf (fdefinition 'f) #'(lambda (a) (block f b...)))" || 'Valid Lisp code with parenthesis closed and enclosed'
             """|(let ((stuff (should-be-constant)))                   
                |(setf (third stuff) 'bizarre)) 
-            """.stripIndent().stripMargin()                         || 'Valid Lisp code with parenthesis closed and enclosed'
+            """.stripIndent().stripMargin().trim()                  || 'Valid Lisp code with parenthesis closed and enclosed'
             """|(write-line "Semicolon in string\\;")
                |(write-line "Groovy testing\\\\")
                |;single Semicolon comment
@@ -53,7 +53,7 @@ class LispParenthesisValidatorTest extends Specification {
                |multiline comment
                ||#
                |(write-line "Welcome to \\"Groovy Testing\\"")
-            """.stripIndent().stripMargin()                         || """|Valid Lisp code with parenthesis closed and enclosed
+            """.stripIndent().stripMargin().trim()                  || """|Valid Lisp code with parenthesis closed and enclosed
                                                                           |Valid Lisp line comment (expression inside is ignored)
                                                                           |Valid Lisp multi line comment (expression inside is ignored)
                                                                        """.stripIndent().stripMargin().trim()
@@ -67,11 +67,11 @@ class LispParenthesisValidatorTest extends Specification {
                |(make-instance 'book
                |               :title "ANSI Common Lisp"
                |               :author "Paul Graham")
-               """.stripIndent().stripMargin()                      || 'Valid Lisp code with parenthesis closed and enclosed'
+               """.stripIndent().stripMargin().trim()               || 'Valid Lisp code with parenthesis closed and enclosed'
     }
 
     @Unroll
-    def 'Input lisp code `#expression` has invalid parenthesis because of `#failedValidationResult`'() {
+    def 'Input lisp code \n#expression\nhas invalid parenthesis because of `#failedValidationResult`'() {
         when: 'Lisp code expression are validated'
             def validationResult = LispParenthesisValidator.validate expression
 
@@ -90,11 +90,11 @@ class LispParenthesisValidatorTest extends Specification {
             "(reduce #'-"                                  || 'Incomplete parenthesis in Lisp code'
             """|(reduce #'-
                |    reverse (list 1 2 3)))
-            """.stripMargin().stripIndent()                || 'Incomplete parenthesis in Lisp code'
+            """.stripMargin().stripIndent().trim()         || 'Incomplete parenthesis in Lisp code'
             """|#|
                |(reduce #'-
                |    (reverse (list 1 2 3)))
-            """.stripIndent().stripMargin()                || """|Incomplete multiline comment in Lisp code
+            """.stripIndent().stripMargin().trim()         || """|Incomplete multiline comment in Lisp code
                                                                  |(Ignored expression inside it, even though it is 
                                                                  | valid expression)
                                                               """.stripMargin().stripIndent().trim()
