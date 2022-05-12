@@ -24,8 +24,11 @@ afterEvaluate {
 
         dependencyManagement {
             imports {
-                mavenBom "org.spockframework:spock-bom:${spockBomVersion}"  // This has managed dependencies of spock modules including spock-core module
-                mavenBom "org.spockframework:spock-core:${spockBomVersion}" // Junit5 bom is managed dependencies of spock-core module bom
+                // This has managed dependencies of spock modules including spock-core module
+                mavenBom "org.spockframework:spock-bom:${spockBomVersion}"
+                // Junit5 bom is managed dependencies of spock-core module bom
+                mavenBom "org.spockframework:spock-core:${spockBomVersion}"
+                // This has managed dependencies of fasterxml jackson modules including dataformat-csv
                 mavenBom "com.fasterxml.jackson:jackson-bom:${jacksonBomVersion}"
             }
         }

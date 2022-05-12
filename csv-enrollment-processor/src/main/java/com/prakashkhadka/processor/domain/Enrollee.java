@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * A POJO representation of Enrollee
+ *
+ * @author Prakash Khadka <br>
+ *         Created on: May 11, 2022
  */
 @JsonPropertyOrder({"userId", "firstName", "lastName", "version", "insuranceCompany"})
 public class Enrollee {

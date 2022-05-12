@@ -19,7 +19,7 @@ public class LispParenthesisValidator {
     private static final char MULTI_LINE_COMMENT_PIPE = '|';
 
     /**
-     * Validates the given Lisp expression if parenthesis is complete
+     * Validates the given Lisp expression if parenthesis is complete and enclosed
      *
      * @param expression a Lisp expression to validate
      *
@@ -40,6 +40,9 @@ public class LispParenthesisValidator {
      * and multiline Lisp comment convention. Uses Stack to track the parenthesis (push when start and pop when end),
      * until all the character in the given expression is evaluated, it will check if the stack is empty or not. If
      * stack is empty then the given Lisp expression is mark closed and nested.
+     *
+     * The expression inside supported line comments include line comment is ignored and this will check for the end of
+     * enclosed multiline comment.
      *
      * Space Complexity: O(p) where p is the number of start parenthesis in the given expression
      * Time Complexity: O(n) where n is the size of given expression
