@@ -15,11 +15,11 @@ import spock.lang.Unroll
 class LispParenthesisValidatorTest extends Specification {
 
     @Unroll
-    def 'Input lisp code #expression has valid parenthesis'() {
-        given: 'Lisp code expression'
+    def 'Input lisp code `#expression` has valid parenthesis'() {
+        when: 'Given Lisp code expression are validated'
             def validation = LispParenthesisValidator.validate(expression)
 
-        expect: 'Lisp expression have valid parenthesis'
+        then: 'Lisp expression have valid parenthesis'
             assertTrue validation, "Valid parenthesis"
 
         where: 'Input expression are'
@@ -52,7 +52,7 @@ class LispParenthesisValidatorTest extends Specification {
                |#| 
                |multiline comment
                ||#
-               |(write-line "Welcome to \\"Tutorials Point\\"")
+               |(write-line "Welcome to \\"Groovy Testing\\"")
             """.stripIndent().stripMargin()                           | _
             """|(defclass book ()
                |  ((title :reader book-title
@@ -68,11 +68,11 @@ class LispParenthesisValidatorTest extends Specification {
     }
 
     @Unroll
-    def 'Input lisp code #expression has invalid parenthesis'() {
-        given: 'Lisp code expression'
+    def 'Input lisp code `#expression` has invalid parenthesis'() {
+        when: 'Given Lisp code expression are validated'
             def validationResult = LispParenthesisValidator.validate(expression)
 
-        expect: 'Lisp expression have valid parenthesis'
+        then: 'Lisp expression should not have valid parenthesis'
             assertFalse validationResult, "Invalid parenthesis"
 
         where: 'Input expression are'

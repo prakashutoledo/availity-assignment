@@ -1,6 +1,7 @@
 buildscript {
     ext {
         spockBomVersion = '2.1-groovy-3.0'
+        jacksonBomVersion= '2.13.2'
         dependencyManagementPluginVersion = '1.0.11.RELEASE'
     }
 }
@@ -25,6 +26,7 @@ afterEvaluate {
             imports {
                 mavenBom "org.spockframework:spock-bom:${spockBomVersion}"  // This has managed dependencies of spock modules including spock-core module
                 mavenBom "org.spockframework:spock-core:${spockBomVersion}" // Junit5 bom is managed dependencies of spock-core module bom
+                mavenBom "com.fasterxml.jackson:jackson-bom:${jacksonBomVersion}"
             }
         }
 

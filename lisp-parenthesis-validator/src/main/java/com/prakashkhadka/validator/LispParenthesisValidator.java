@@ -53,7 +53,8 @@ public class LispParenthesisValidator {
         }
 
         Stack<Character> stack = new Stack<>();
-        for(int i = 0; i < expression.length(); i++) {
+        int size = expression.length();
+        for(int i = 0; i < size; i++) {
             char currentCharacter = expression.charAt(i);
 
             switch (currentCharacter) {
@@ -73,21 +74,21 @@ public class LispParenthesisValidator {
                     break;
 
                 case MULTI_LINE_COMMENT_SHARP:
-                    if (++i >= expression.length()) {
+                    if (++i >= size) {
                         return false;
                     }
                     if (expression.charAt(i) == MULTI_LINE_COMMENT_PIPE) {
-                        if (++i >= expression.length()) {
+                        if (++i >= size) {
                             return false;
                         }
 
                         while(expression.charAt(i) != MULTI_LINE_COMMENT_PIPE) {
-                            if (++i >= expression.length()) {
+                            if (++i >= size) {
                                 return false;
                             }
                         }
 
-                        if (++i >= expression.length()) {
+                        if (++i >= size) {
                             return false;
                         }
 
@@ -96,8 +97,9 @@ public class LispParenthesisValidator {
                         }
                     }
                     break;
+
                 case SINGLE_LINE_COMMENT:
-                    if (++i < expression.length()) {
+                    if (++i < size) {
                         while(expression.charAt(i) !=  NEW_LINE) {
                             if (++i >= expression.length()) {
                                 break;

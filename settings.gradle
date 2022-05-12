@@ -8,5 +8,7 @@ pluginManagement {
     }
 }
 
-include 'lisp-parenthesis-validator'
+['lisp-parenthesis-validator', 'csv-enrollment-processor'].each {
+    include it
+}
 rootProject.name = 'availity-assignment'
