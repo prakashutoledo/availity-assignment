@@ -19,7 +19,7 @@ class LispParenthesisValidatorTest extends Specification {
         when: 'Lisp code expression are validated'
             def validation = LispParenthesisValidator.validate expression
 
-        then: 'Lisp expression have valid parenthesis'
+        then: 'Lisp expression should have closed parenthesis with validation success reason'
             assertTrue validation, validationSuccessReason
 
         where: 'Input expression are'
@@ -75,7 +75,7 @@ class LispParenthesisValidatorTest extends Specification {
         when: 'Lisp code expression are validated'
             def validationResult = LispParenthesisValidator.validate expression
 
-        then: 'Lisp expression should not have valid parenthesis'
+        then: 'Lisp expression should not have valid parenthesis with failed validation reason'
             assertFalse validationResult, failedValidationResult
 
         where: 'Input expression are'
