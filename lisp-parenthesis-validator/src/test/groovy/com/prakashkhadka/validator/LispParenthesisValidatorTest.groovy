@@ -33,11 +33,11 @@ class LispParenthesisValidatorTest extends Specification {
             """|#|
                |;(mapcar #'+ '(1 2 3 4 5) '(10 20 30 40 50))"
                ||#
-            """.stripIndent().stripMargin()          || 'Valid Lisp multiline comment (expression inside is ignored)'
+            """.stripIndent().stripMargin()                         || 'Valid Lisp multiline comment (expression inside is ignored)'
             """|(defun factorial (n)
                |    (if (zerop n) 1
                |        (* n (factorial (1- n)))))
-            """.stripIndent().stripMargin()          || 'Valid Lisp code with parenthesis closed and enclosed'
+            """.stripIndent().stripMargin()                         || 'Valid Lisp code with parenthesis closed and enclosed'
             '(or (and "zero" nil "never") "James" \'task \'time)'   || 'Valid Lisp code with parenthesis closed and enclosed'
             '((lambda (arg) (+ arg 1)) 5)'                          || 'Valid Lisp code with parenthesis closed and enclosed'
             "(setf (fdefinition 'f) #'(lambda (a) (block f b...)))" || 'Valid Lisp code with parenthesis closed and enclosed'
