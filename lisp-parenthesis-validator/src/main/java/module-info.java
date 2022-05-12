@@ -1,5 +1,9 @@
 /**
- * Module 'availity.assignment.lisp.parenthesis.validator'
+ * This module provides support for validation utility class
+ * <p>
+ *     The {@link com.prakashkhadka.validator} is the package provides implementation of
+ *     Lisp code parenthesis validator
+ * </p>
  *
  * @author Prakash Khadka <br>
  *         Created on: May 11, 2022

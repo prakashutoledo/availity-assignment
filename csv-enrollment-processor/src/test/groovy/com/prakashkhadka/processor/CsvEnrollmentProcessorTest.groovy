@@ -1,13 +1,12 @@
 package com.prakashkhadka.processor
 
-import java.nio.file.Files
-
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertTrue
 
 import spock.lang.Specification
 import spock.lang.TempDir
 
+import java.nio.file.Files
 import java.nio.file.Path
 
 /**
@@ -30,7 +29,7 @@ class CsvEnrollmentProcessorTest extends Specification {
         and: 'Should match exception message'
             assertEquals "Invalid filename", exception.message, reason
 
-        where:
+        where: 'Input csv file path with exception reason are'
             filePath         || reason
             ''               || 'Empty file path'
             '   '            || 'Blank file path'
@@ -49,7 +48,7 @@ class CsvEnrollmentProcessorTest extends Specification {
         and: 'Should match exception message'
             assertEquals "Invalid file path", exception.message, reason
 
-        where:
+        where: 'Input csv file path with exception reason are'
             filePath                           || reason
             Path.of("non-existing-file")       || 'File path without extension'
             Path.of("non-existing-file.excel") || 'File path other than .csv extension'
@@ -74,17 +73,19 @@ class CsvEnrollmentProcessorTest extends Specification {
                                 |21,firstName21,lastName21,21,company1
                                 |46,firstName46,lastName46,46,company2
                               """.stripIndent().stripMargin().trim()
-        def absolutePath = Files.writeString Path.of(temporaryDirectoryPath.toString(), 'test.csv') , csvContents
+            def absolutePath = Files.writeString Path.of(temporaryDirectoryPath.toString(), 'test.csv'), csvContents
+
+        when: 'Given csv file path is processed for enrollment'
             CsvEnrollmentProcessor.processFile absolutePath.toString()
 
-        expect:
+        then: 'Should create individual files for each company'
             def company1CsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
                       |1,firstName1,lastName1,2,company1
                       |21,firstName21,lastName21,21,company1
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents'company1.csv', company1CsvContents
+            validateCsvContents 'company1.csv', company1CsvContents
 
             def company2CsvContents =
                     """
@@ -93,7 +94,7 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |2,firstName2,lastName2,11,company2
                       |46,firstName46,lastName46,46,company2
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents'company2.csv', company2CsvContents
+            validateCsvContents 'company2.csv', company2CsvContents
 
             def company3CsvContents =
                     """
@@ -102,33 +103,35 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |4,firstName8,lastName8,6,company3
                       |3,firstName9,lastName9,9,company3
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents'company3.csv', company3CsvContents
+            validateCsvContents 'company3.csv', company3CsvContents
     }
 
     def 'Processing valid csv file path'() {
         given: 'Valid csv file path'
             def csvContents =
-                        """
-                            |userId,firstName,lastName,version,insuranceCompany
-                            |1,John,Shelby,1,CompanyX
-                            |1,John,Shelby,2,CompanyX
-                            |33,Haily,Shell,33,CompanyX
-                            |2,Paul,Ryan,10,CompanyZ
-                            |3,Sydney,White,9,CompanyZ
-                            |3,Sydney,White,8,CompanyZ
-                            |4,Tessa,Shetty,6,CompanyZ
-                            |2,Tom,Hawk,10,CompanyY
-                            |2,Tom,Hawk,8,CompanyY
-                            |2,Tom,Hawk,11,CompanyY
-                            |32,Raheem,Sterling,1,CompanyY
-                            |24,Frank,Lampard,24,CompanyX
-                            |46,Eden,Hazard,46,CompanyY
-                            |1,John,Shelby,2,CompanyX
-                         """.stripIndent().stripMargin().trim()
-            def absolutePath = Files.writeString Path.of(temporaryDirectoryPath.toString(), 'path.csv') , csvContents
+                    """
+                      |userId,firstName,lastName,version,insuranceCompany
+                      |1,John,Shelby,1,CompanyX
+                      |1,John,Shelby,2,CompanyX
+                      |33,Haily,Shell,33,CompanyX
+                      |2,Paul,Ryan,10,CompanyZ
+                      |3,Sydney,White,9,CompanyZ
+                      |3,Sydney,White,8,CompanyZ
+                      |4,Tessa,Shetty,6,CompanyZ
+                      |2,Tom,Hawk,10,CompanyY
+                      |2,Tom,Hawk,8,CompanyY
+                      |2,Tom,Hawk,11,CompanyY
+                      |32,Raheem,Sterling,1,CompanyY
+                      |24,Frank,Lampard,24,CompanyX
+                      |46,Eden,Hazard,46,CompanyY
+                      |1,John,Shelby,2,CompanyX
+                    """.stripIndent().stripMargin().trim()
+            def absolutePath = Files.writeString Path.of(temporaryDirectoryPath.toString(), 'path.csv'), csvContents
+
+        when: 'Given csv file path is processed for enrollment'
             CsvEnrollmentProcessor.processFile absolutePath
 
-        expect:
+        then: 'Should create individual files for each company'
             def companyXCsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
@@ -136,25 +139,25 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |1,John,Shelby,2,CompanyX
                       |33,Haily,Shell,33,CompanyX
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents'CompanyX.csv', companyXCsvContents
+            validateCsvContents 'CompanyX.csv', companyXCsvContents
 
-        def companyYCsvContents =
+            def companyYCsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
                       |2,Tom,Hawk,11,CompanyY
                       |46,Eden,Hazard,46,CompanyY
                       |32,Raheem,Sterling,1,CompanyY
                     """.stripMargin().stripIndent().trim()
-        validateCsvContents'CompanyY.csv', companyYCsvContents
+            validateCsvContents 'CompanyY.csv', companyYCsvContents
 
-        def companyZCsvContents =
-                """
+            def companyZCsvContents =
+                    """
                       |userId,firstName,lastName,version,insuranceCompany
                       |2,Paul,Ryan,10,CompanyZ
                       |4,Tessa,Shetty,6,CompanyZ
                       |3,Sydney,White,9,CompanyZ
                     """.stripMargin().stripIndent().trim()
-        validateCsvContents'CompanyZ.csv', companyZCsvContents
+            validateCsvContents 'CompanyZ.csv', companyZCsvContents
     }
 
     /**

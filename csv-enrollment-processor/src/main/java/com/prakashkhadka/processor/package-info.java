@@ -1,6 +1,5 @@
 /**
- * Package 'com.prakashkhadka.processor' which is
- * is exported into module 'availity.assignment.csv.enrollment.processor'
+ * Defines enrollment processor for CSV file format
  *
  * @author Prakash Khadka <br>
  *         Created on: May 11, 2022
