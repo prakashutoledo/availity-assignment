@@ -67,7 +67,7 @@ class LispParenthesisValidatorTest extends Specification {
                |(make-instance 'book
                |               :title "ANSI Common Lisp"
                |               :author "Paul Graham")
-               """.stripIndent().stripMargin().trim()               || 'Valid Lisp code with parenthesis closed and enclosed'
+            """.stripIndent().stripMargin().trim()                  || 'Valid Lisp code with parenthesis closed and enclosed'
     }
 
     @Unroll

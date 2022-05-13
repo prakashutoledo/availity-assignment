@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -84,7 +85,7 @@ public class CsvEnrollmentProcessor {
      * @throws IllegalArgumentException if file path is null or it's string representation doesn't end with .csv extension
      * @throws UncheckedIOException     if unexpected io exception occurs while process the input stream of the given path
      */
-    private void process(Path path) {
+    private void process(final Path path) {
         if (path == null || !path.toString().endsWith(CSV_EXTENSION) || !Files.exists(path)) {
             throw new IllegalArgumentException("Invalid file path");
         }
@@ -109,7 +110,7 @@ public class CsvEnrollmentProcessor {
      *
      * @throws IOException if error occurred while mapping csv contents from stream
      */
-    private void processStream(final Path parentPath, InputStream inputStream) throws IOException {
+    private void processStream(final Path parentPath, final InputStream inputStream) throws IOException {
         MappingIterator<Enrollee> enrolleesMappingIterator = CSV_MAPPER
                 .readerFor(Enrollee.class)
                 .with(DEFAULT_SCHEMA)
@@ -151,7 +152,7 @@ public class CsvEnrollmentProcessor {
      *
      * @throws UncheckedIOException if unexpected io exception occurs writing mapped enrollees into csv contents
      */
-    private void writeCsv(Path csvPath, List<Enrollee> enrollees) {
+    private void writeCsv(final Path csvPath, final List<Enrollee> enrollees) {
         try (BufferedWriter printWriter = Files.newBufferedWriter(csvPath, UTF_8, CREATE, TRUNCATE_EXISTING, WRITE)) {
             CSV_MAPPER.writer(DEFAULT_SCHEMA).writeValue(printWriter, enrollees);
         } catch (IOException exception) {

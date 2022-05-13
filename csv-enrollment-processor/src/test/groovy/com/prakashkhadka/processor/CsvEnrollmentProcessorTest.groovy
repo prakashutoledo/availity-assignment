@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue
 
 import spock.lang.Specification
 import spock.lang.TempDir
+import spock.lang.Unroll
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -56,6 +57,25 @@ class CsvEnrollmentProcessorTest extends Specification {
             null                               || 'Null path'
     }
 
+    @Unroll
+    def 'Processing unsupported operation during runtime for valid file name without valid contents'() {
+        given: 'Invalid csv contents written into csv file'
+            def absoluteCsvPath = writeCsvContents 'test', csvContents
+
+        when: 'Given csv file path is processed for enrollment'
+            CsvEnrollmentProcessor.processFile absoluteCsvPath
+
+        then: 'Thrown Exception'
+            thrown UncheckedIOException
+
+        where: 'Invalid csv contents input are'
+            csvContents                                           | _
+            """|userId,firstName,lastName,version,insuranceCompany
+               |test1,test2,test3,test4,test5
+            """.stripIndent().stripMargin().trim()                | _
+
+    }
+
     def 'Processing valid csv string file path'() {
         given: 'Valid csv file path'
             def csvContents = """
@@ -73,12 +93,12 @@ class CsvEnrollmentProcessorTest extends Specification {
                                 |21,firstName21,lastName21,21,company1
                                 |46,firstName46,lastName46,46,company2
                               """.stripIndent().stripMargin().trim()
-            def absolutePath = Files.writeString Path.of(temporaryDirectoryPath.toString(), 'test.csv'), csvContents
+            def absoluteCsvPath = writeCsvContents 'test', csvContents
 
         when: 'Given csv file path is processed for enrollment'
-            CsvEnrollmentProcessor.processFile absolutePath.toString()
+            CsvEnrollmentProcessor.processFile absoluteCsvPath.toString()
 
-        then: 'Should create individual files for each company'
+        then: 'Should create csv file for company 1'
             def company1CsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
@@ -87,6 +107,7 @@ class CsvEnrollmentProcessorTest extends Specification {
                     """.stripMargin().stripIndent().trim()
             validateCsvContents 'company1.csv', company1CsvContents
 
+        and: 'Should create csv file for company 2'
             def company2CsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
@@ -96,6 +117,7 @@ class CsvEnrollmentProcessorTest extends Specification {
                     """.stripMargin().stripIndent().trim()
             validateCsvContents 'company2.csv', company2CsvContents
 
+        and: 'Should create csv file for company 3'
             def company3CsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
@@ -126,12 +148,12 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |46,Eden,Hazard,46,CompanyY
                       |1,John,Shelby,2,CompanyX
                     """.stripIndent().stripMargin().trim()
-            def absolutePath = Files.writeString Path.of(temporaryDirectoryPath.toString(), 'path.csv'), csvContents
+            def absoluteCsvPath = writeCsvContents 'test', csvContents
 
         when: 'Given csv file path is processed for enrollment'
-            CsvEnrollmentProcessor.processFile absolutePath
+            CsvEnrollmentProcessor.processFile absoluteCsvPath
 
-        then: 'Should create individual files for each company'
+        then: 'Should create csv file for company X'
             def companyXCsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
@@ -139,8 +161,9 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |1,John,Shelby,2,CompanyX
                       |33,Haily,Shell,33,CompanyX
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents 'CompanyX.csv', companyXCsvContents
+            validateCsvContents 'CompanyX', companyXCsvContents
 
+        and: 'Should create csv file for company Y'
             def companyYCsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
@@ -148,8 +171,9 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |46,Eden,Hazard,46,CompanyY
                       |32,Raheem,Sterling,1,CompanyY
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents 'CompanyY.csv', companyYCsvContents
+            validateCsvContents 'CompanyY', companyYCsvContents
 
+        and: 'Should create csv file for company Z'
             def companyZCsvContents =
                     """
                       |userId,firstName,lastName,version,insuranceCompany
@@ -157,7 +181,11 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |4,Tessa,Shetty,6,CompanyZ
                       |3,Sydney,White,9,CompanyZ
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents 'CompanyZ.csv', companyZCsvContents
+            validateCsvContents 'CompanyZ', companyZCsvContents
+    }
+
+    private Path writeCsvContents(String fileName, String csvContents) {
+        return Files.writeString(Path.of(temporaryDirectoryPath.toString(), "${fileName}.csv"), csvContents)
     }
 
     /**
@@ -167,7 +195,7 @@ class CsvEnrollmentProcessorTest extends Specification {
      * @param expectedCsvContents an expected CSV contents to match
      */
     private void validateCsvContents(String fileName, String expectedCsvContents) {
-        def actualPath = Path.of temporaryDirectoryPath.toString(), fileName
+        def actualPath = Path.of temporaryDirectoryPath.toString(), "${fileName}.csv"
         assertTrue Files.exists(actualPath), 'File do exists'
         assertEquals expectedCsvContents, Files.readString(actualPath).trim(), "Csv contents are matched"
     }
