@@ -29,5 +29,5 @@ This will build all subprojects and, also run `npm install` followed by `npm run
 
 ### Working Sample
 
-A sample of react application for project [registration-user-interface)](/registration-user-interface) is hosted in AWS S3
+A sample of react application for project [registration-user-interface](/registration-user-interface) is hosted in AWS S3
 which can be access by [https://registration-form.s3.us-east-2.amazonaws.com/index.html](https://registration-form.s3.us-east-2.amazonaws.com/index.html)
