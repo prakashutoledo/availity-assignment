@@ -29,8 +29,8 @@ jobs:
         with:
           generate-branches-badge: true
           jacoco-csv-file: >
-            lisp-parenthesis-validator/reports/jacoco/test/jacocoTestReport.csv
-            csv-enrollment-processor/reports/jacoco/test/jacocoTestReport.csv
+            lisp-parenthesis-validator/build/reports/jacoco/test/jacocoTestReport.csv
+            csv-enrollment-processor/build/reports/jacoco/test/jacocoTestReport.csv
       - name: Commit the badge (if it changed)
         run: |
           if [[ `git status --porcelain` ]]; then
