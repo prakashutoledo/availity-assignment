@@ -22,5 +22,5 @@ jobs:
           cd ./registration-user-interface
           npm install
           cd ../
-      - name: Gradle test
-        run: ./gradlew test
+      - name: Gradle test and build
+        run: ./gradlew test build

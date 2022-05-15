@@ -1,6 +1,6 @@
 apply plugin: 'com.github.node-gradle.node'
 
-task bundle(type: NpmTask, dependsOn: [clean, test, npmInstall]) {
+task bundle(type: NpmTask, dependsOn: [npmInstall, test]) {
     description 'Cleans and runs `npm install` followed by `npm run build'
     args = ['run', 'build']
 }
