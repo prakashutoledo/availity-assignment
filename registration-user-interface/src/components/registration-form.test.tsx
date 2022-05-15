@@ -68,7 +68,7 @@ describe('Validating text input fields', () => {
         ${"address1"}  | ${"Address line 1 must not be empty."}  | ${"    "}   | ${"Somewhere"}
         ${"country"}   | ${"Country must not be empty."}         | ${"    "}   | ${"Country"}
         ${"zip"}       | ${"Enter a valid zip"}                  | ${"123"}    | ${"43607"}
-    `("Should validate input: textInputId with errorText: $error", ({textInputId, error, invalidText, validText}) => {
+    `("Should validate input: $textInputId with errorText: $error", ({textInputId, error, invalidText, validText}) => {
         const input = expectSelectFocus(textInputId)
         expectAct(() => input?.blur());
         expect(input).not.toHaveFocus()
@@ -116,18 +116,21 @@ describe('Should validate register button', () => {
 
 
     it('Should submit aws api gateway request on visible button is clicked with', async ()  => {
-        let axiosMock = new MockAdapter(axios);
+        let mockAxios = new MockAdapter(axios);
         const {submitButton} = expectVisibleButton(false);
 
-        axiosMock.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id"});
+        mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id"});
 
+        // Can't use expectAct here, as expectAct is synchronous process and will not wait for all state change event
+        // to be capture in act. Either make expectAct to be async and await it for act call back or call act explicitly
+        // and await for it.
         await act(async () => {
             fireEvent.click(submitButton!);
         });
 
         await waitFor(() => {
-            expect(axiosMock.history.post[0].url).toBe(apiGatewayEndpoint)
-            expect(JSON.parse(axiosMock.history.post[0].data)).toStrictEqual({
+            expect(mockAxios.history.post[0].url).toBe(apiGatewayEndpoint)
+            expect(JSON.parse(mockAxios.history.post[0].data)).toStrictEqual({
                     firstName: "first name",
                     lastname: "last name",
                     npi: "0123456789",
@@ -146,8 +149,8 @@ describe('Should validate register button', () => {
             expect(document.body?.querySelector('#modal-modal-description')?.textContent).toBe('fake-request-id');
         });
 
-        axiosMock.reset()
-        axiosMock.onPost(apiGatewayEndpoint).networkErrorOnce();
+        mockAxios.reset()
+        mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce();
         await act(async () => {
             fireEvent.click(submitButton!);
         });
@@ -159,12 +162,27 @@ describe('Should validate register button', () => {
     });
 });
 
+/**
+ * Expects the given selector element to be in the document
+ *
+ * @param selector a selector value
+ *
+ * @returns the element matching selector
+ */
 const expectSelector = (selector: string) => {
     const element = document.querySelector(selector);
     expect(element).toBeInTheDocument();
     return element;
 }
 
+/**
+ * Expects the element with matching data-testid to have given attributes
+ *
+ * @param testId a data-testid of html element
+ * @param attributes a html attributes of the element
+ *
+ * @returns the matching element matching given data-testid
+ */
 const expectDataTestId = (testId: string, attributes: Map<string, string> = new Map<string, string>()) => {
     const element = expectSelector(`[data-testid=${testId}]`);
     attributes.forEach((value, key) => {
@@ -173,30 +191,65 @@ const expectDataTestId = (testId: string, attributes: Map<string, string> = new 
     return element;
 }
 
+/**
+ * Expects the given html element id label name to match given
+ * @param labelId a html element id
+ * @param expected an expected value of context text of the element matching given id
+ * @param required checks if label is mark required or not
+ */
 const expectLabel = (labelId: string, expected: string, required: boolean = false) => {
     const element = expectSelector(`#${labelId}`)
     return expectRequired(element, required ? `${expected} *` : expected)
 };
 
+/**
+ * Expects the given html element input id label name to match given expected value and also see if the input element is
+ * required field or not
+ *
+ * @param inputId an html element input id
+ * @param expected an expected label name of element
+ * @param required a flag to check if the given field is required field or not
+ *
+ * @returns last child of the given element parent element
+ */
 const expectInput = (inputId: String, expected: string, required: boolean = false) => {
     expectLabel(`${inputId}-label`, expected, required)
     const element = expectSelector(`#${inputId}`)
     return expectRequired(element?.parentElement?.lastElementChild, required ? `${expected} *` : expected)
 };
 
+/**
+ * Expects the given html element text content to match given expected string
+ * @param element an element to check
+ * @param expected an expected text content
+ *
+ * @returns the same element
+ */
 const expectRequired = (element: Element | null | undefined, expected: string) => {
     expect(element?.textContent).toBe(expected)
     return element
 };
 
+/**
+ * Expects the html button to have given label and checks if it is disabled or not
+ * @param expectedLabel an expected label name of button
+ * @param disabled checks if button is disabled or not
+ */
 const expectButton = (expectedLabel: string, disabled: boolean = false) => {
     const button = expectSelector('button')
     if (disabled) {
         expect(button).toBeDisabled()
     }
+    else {
+        expect(button).not.toBeDisabled()
+    }
     expectRequired(button, expectedLabel)
 };
 
+/**
+ * Expects the given callback to be captured into act
+ * @param callback a callback to be run inside act callback
+ */
 const expectAct = (callback: () => void | undefined = () => ReactDOM.createRoot(container!)?.render(<RegistrationForm />)) => {
     act(() => {
         callback()
@@ -204,6 +257,11 @@ const expectAct = (callback: () => void | undefined = () => ReactDOM.createRoot(
     expect(container).toBeTruthy();
 };
 
+/**
+ * Expects the given html input element id to be focused when firing focus event. This will also expects
+ * helper text to be invisible while focusing the element
+ * @param textInputId a html input element id
+ */
 const expectSelectFocus = (textInputId : string) => {
     const input = document.getElementById(textInputId);
     expectAct(() => input?.focus());
@@ -214,8 +272,14 @@ const expectSelectFocus = (textInputId : string) => {
     return input;
 };
 
-const expectErrorText = (textInput: string, error: string | null = null) => {
-    const errorText = container?.querySelector(`#${textInput}-helper-text`);
+/**
+ * Expect the text input helper text to match given error if set
+ *
+ * @param textInputId an id of input text field
+ * @param error an error to match inner html for given helper text
+ */
+const expectErrorText = (textInputId: string, error: string | null = null) => {
+    const errorText = container?.querySelector(`#${textInputId}-helper-text`);
     if (!error) {
         expect(errorText).toBeNull();
     }
@@ -224,12 +288,26 @@ const expectErrorText = (textInput: string, error: string | null = null) => {
     }
 }
 
+/**
+ * Fire input change event for given element with target value set to given value first by selecting the element,
+ * changing the value and at last sending blur event to element
+ *
+ * @param element an html element to send fire change events
+ * @param value a target value to change with on change event
+ */
 const fireChangeEventWithValue = (element: HTMLElement | null, value: string) => {
     fireEvent.select(element!)
     fireEvent.change(element!, {target: {value: value}})
     element?.blur()
 }
 
+/**
+ * Either make registration button visible by entering all inputs with valid input or fail
+ * zip input with invalid one
+ * @param failOne flag to fail zip input if set to true
+ *
+ * @returns submit button and zip input html element
+ */
 const expectVisibleButton = (failOne: boolean) => {
     const submitButton = document.getElementById("submitRegistration");
     const firstNameInput = expectSelectFocus("firstName");

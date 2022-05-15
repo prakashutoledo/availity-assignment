@@ -1,5 +1,5 @@
 import React from 'react';
-import './Application.css';
+import './application.css';
 import { RegistrationForm } from './components/registration-form';
 
 /**
@@ -9,7 +9,7 @@ import { RegistrationForm } from './components/registration-form';
  */
 function Application() {
   return (
-      <div className="App">
+      <div className="Application">
         <RegistrationForm />
       </div>
   );

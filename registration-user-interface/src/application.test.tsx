@@ -1,6 +1,6 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import Application from './Application';
+import Application from './application';
 import {act} from "react-dom/test-utils";
 
 it('Should render registration form in div', () => {
@@ -10,6 +10,6 @@ it('Should render registration form in div', () => {
     createRoot(container!)?.render(<Application />);
   });
   expect(container?.querySelector('div')).toBeInTheDocument()
-  expect(container?.querySelector('.App')).toBeInTheDocument()
+  expect(container?.querySelector('.Application')).toBeInTheDocument()
   document.body.removeChild(container)
 });

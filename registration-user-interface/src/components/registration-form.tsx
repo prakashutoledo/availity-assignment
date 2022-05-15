@@ -40,7 +40,7 @@ export const RegistrationForm = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [requestId, setRequestId] = useState("");
 
-    // Need to use get the changed state of all states for dynamic form validation
+    // Need to use this to get changed state of all states for dynamic form validation
     useEffect(() => {
         /**
          * Validates all the error to see if registration button can be enable or not

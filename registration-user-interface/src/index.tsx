@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Application from './Application';
+import Application from './application';
 import { ThemeProvider } from '@emotion/react';
 import { muiTheme } from './theme';
 import { CssBaseline } from '@mui/material';
