@@ -55,16 +55,4 @@ public class Enrollee {
     public void setInsuranceCompany(String insuranceCompany) {
         this.insuranceCompany = insuranceCompany;
     }
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("{");
-        sb.append("userId='").append(userId).append('\'');
-        sb.append(", firstName='").append(firstName).append('\'');
-        sb.append(", lastName='").append(lastName).append('\'');
-        sb.append(", version=").append(version);
-        sb.append(", insuranceCompany='").append(insuranceCompany).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
 }

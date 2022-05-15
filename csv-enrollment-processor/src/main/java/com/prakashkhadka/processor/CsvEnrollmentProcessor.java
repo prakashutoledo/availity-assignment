@@ -129,19 +129,13 @@ public class CsvEnrollmentProcessor {
                             return newValue;
                         })));
 
-        companyEnrolleeMapByUserId.forEach((companyName, companyEnrolleeMap) -> {
+        for(String companyName : companyEnrolleeMapByUserId.keySet()) {
             String companyCsvName = String.format("%s.csv", companyName);
-
-            Path companyCsvPath = Optional.ofNullable(parentPath)
-                    .map(path -> Path.of(path.toString(), companyCsvName))
-                    .orElseGet(() -> Path.of(companyCsvName));
-
-            List<Enrollee> enrolleesByCompany = new ArrayList<>(companyEnrolleeMap.values());
-
+            List<Enrollee> enrolleesByCompany = new ArrayList<>(companyEnrolleeMapByUserId.get(companyName).values());
             // Sort enrollees by last name and then by first name
             enrolleesByCompany.sort(comparing(Enrollee::getLastName).thenComparing(Enrollee::getFirstName));
-            writeCsv(companyCsvPath, enrolleesByCompany);
-        });
+            writeCsv(Path.of(parentPath.toString(), companyCsvName), enrolleesByCompany);
+        }
     }
 
     /**
@@ -152,11 +146,9 @@ public class CsvEnrollmentProcessor {
      *
      * @throws UncheckedIOException if unexpected io exception occurs writing mapped enrollees into csv contents
      */
-    private void writeCsv(final Path csvPath, final List<Enrollee> enrollees) {
+    private void writeCsv(final Path csvPath, final List<Enrollee> enrollees) throws IOException {
         try (BufferedWriter printWriter = Files.newBufferedWriter(csvPath, UTF_8, CREATE, TRUNCATE_EXISTING, WRITE)) {
             CSV_MAPPER.writer(DEFAULT_SCHEMA).writeValue(printWriter, enrollees);
-        } catch (IOException exception) {
-            throw new UncheckedIOException(exception);
         }
     }
 }

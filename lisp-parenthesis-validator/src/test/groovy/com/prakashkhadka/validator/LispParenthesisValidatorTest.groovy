@@ -85,8 +85,13 @@ class LispParenthesisValidatorTest extends Specification {
             '   '                                          || 'Blank Lisp code is count invalid'
             '('                                            || 'Incomplete parenthesis in Lisp code'
             '(()'                                          || 'Incomplete parenthesis in Lisp code'
+            '#'                                            || 'Invalid multiline comment in Lisp code'
+            '#|'                                           || 'Invalid multiline comment in Lisp code'
+            '#| '                                          || 'Incomplete multiline comment in Lisp code'
             '#|  '                                         || 'Incomplete multiline comment in Lisp code'
             '#|   \n'                                      || 'Incomplete multiline comment in Lisp code'
+            '#|   |'                                       || 'Incomplete multiline comment in Lisp code'
+            '#|   | '                                      || 'Incomplete multiline comment in Lisp code'
             "(reduce #'-"                                  || 'Incomplete parenthesis in Lisp code'
             """|(reduce #'-
                |    reverse (list 1 2 3)))
