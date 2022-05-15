@@ -29,14 +29,20 @@ Your app is ready to be deployed!
 
 ## If you prefer gradle tasks
 
-### `./gradlew test`
+Script must run from root parent project [availity-assignment](..)
+
+### `./gradlew test` or `./gradlew :registration-user-interface:test`
 
 This will run `npm run test` but in non-interactive CI mode
 
-### `./gradlew bundle`
+### `./gradlew bundle` or `./gradlew :registration-user-interface:bundle`
 
 This will clean the previous build and run `npm run build`
 
-### `./gradlew start`
+### `./gradlew start` or `./gradlew :registration-user-interface:start`
 
 This will run `npm start` in development mode
+
+### Working Sample
+
+[https://registration-form.s3.us-east-2.amazonaws.com/index.html](https://registration-form.s3.us-east-2.amazonaws.com/index.html)

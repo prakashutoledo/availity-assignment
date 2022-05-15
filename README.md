@@ -27,7 +27,7 @@ This will clean all builds for all subprojects. For react application it will al
 
 This will build all subprojects and, also run `npm install` followed by `npm run build` for react application
 
-###
+### Working Sample
 
-A sample of react application for project [csv-enrollment-processor](/csv-enrollment-processor) is hosted in AWS S3
+A sample of react application for project [registration-user-interface)](/registration-user-interface) is hosted in AWS S3
 which can be access by [https://registration-form.s3.us-east-2.amazonaws.com/index.html](https://registration-form.s3.us-east-2.amazonaws.com/index.html)
