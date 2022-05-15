@@ -17,6 +17,10 @@ plugins {
 
 allprojects {
     apply plugin: 'groovy'
+
+    group = 'com.prakashkhadka'
+    version = '1.0.0'
+    sourceCompatibility = '11'
 }
 
 help {
