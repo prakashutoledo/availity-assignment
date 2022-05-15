@@ -20,7 +20,7 @@ jobs:
       - name: 'Install npm dependencies'
         run: |
           cd ./registration-user-interface
-          npm run install
+          npm install
           cd ../
       - name: Gradle test
         run: ./gradlew test
