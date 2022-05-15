@@ -1,6 +1,8 @@
 # availity-assignment
 Availity's FullStack Homework Assignment
-[![CI](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml/badge.svg)](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml)
+[![CI](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml/badge.svg)](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml) 
+[![Coverage](.github/badges/jacoco.svg)](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml)
+![Branches](.github/badges/branches.svg)
 
 # Getting Started 
 
