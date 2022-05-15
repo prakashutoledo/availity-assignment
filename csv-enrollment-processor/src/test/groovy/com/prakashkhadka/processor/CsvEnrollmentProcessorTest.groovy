@@ -176,14 +176,22 @@ class CsvEnrollmentProcessorTest extends Specification {
         and: 'Should create csv file for company Z'
             def companyZCsvContents =
                     """
-                      |userId,firstName,lastName,version,insuranceCompany
-                      |2,Paul,Ryan,10,CompanyZ
-                      |4,Tessa,Shetty,6,CompanyZ
-                      |3,Sydney,White,9,CompanyZ
-                    """.stripMargin().stripIndent().trim()
+                          |userId,firstName,lastName,version,insuranceCompany
+                          |2,Paul,Ryan,10,CompanyZ
+                          |4,Tessa,Shetty,6,CompanyZ
+                          |3,Sydney,White,9,CompanyZ
+                        """.stripMargin().stripIndent().trim()
             validateCsvContents 'CompanyZ', companyZCsvContents
     }
 
+    /**
+     * Writes the given csv contest to the given file with name
+     *
+     * @param fileName a csv file name
+     * @param csvContents a string csv contents
+     *
+     * @return a path of a file with csv contents written into
+     */
     private Path writeCsvContents(String fileName, String csvContents) {
         return Files.writeString(Path.of(temporaryDirectoryPath.toString(), "${fileName}.csv"), csvContents)
     }

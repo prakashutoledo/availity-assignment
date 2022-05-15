@@ -145,22 +145,32 @@ describe('Should validate register button', () => {
                 }
             );
 
-            expect(document.body?.querySelector('#modal-modal-title')?.textContent).toBe('API Gateway Request Id');
-            expect(document.body?.querySelector('#modal-modal-description')?.textContent).toBe('fake-request-id');
+            expectModal('API Gateway Request Id', 'fake-request-id')
         });
 
         mockAxios.reset()
         mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce();
+
         await act(async () => {
             fireEvent.click(submitButton!);
         });
 
         await waitFor(() => {
-            expect(document.body?.querySelector('#modal-modal-title')?.textContent).toBe('API Gateway Request Id');
-            expect(document.body?.querySelector('#modal-modal-description')?.textContent).toBe('Unable to post registration');
+            expectModal('API Gateway Request Id', 'Unable to post registration')
         });
     });
 });
+
+/**
+ * Excepts modal with given title to have given description
+ *
+ * @param title a title of the modal
+ * @param description a description of the modal
+ */
+const expectModal = (title: string, description: string) => {
+    expect(document.body?.querySelector('#modal-modal-title')?.textContent).toBe(title);
+    expect(document.body?.querySelector('#modal-modal-description')?.textContent).toBe(description);
+};
 
 /**
  * Expects the given selector element to be in the document
