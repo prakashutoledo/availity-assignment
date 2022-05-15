@@ -5,6 +5,14 @@ task bundle(type: NpmTask, dependsOn: [clean, test, npmInstall]) {
     args = ['run', 'build']
 }
 
+assemble {
+    enabled  = false
+}
+
+jar {
+    enabled  = false
+}
+
 task npmTest(type: NpmTask) {
     description 'Runs `npm run test` in non interactive mode'
     // Don't want to run our test in watch mode waiting for input to finish
@@ -32,4 +40,8 @@ build {
 
 check {
     dependsOn 'npmTest'
+}
+
+clean {
+    delete file('node_modules')
 }
