@@ -1,5 +1,9 @@
 name: CI
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,8 +27,8 @@ jobs:
           npm install
           cd ../
       - name: Gradle test and build
-        run: ./gradlew test
-      - name: Generate JaCoCo Badge
+        run: ./gradlew test build
+      - name: Generate JaCoCo code coverage badge
         uses: cicirello/jacoco-badge-generator@v2
         with:
           generate-branches-badge: true
