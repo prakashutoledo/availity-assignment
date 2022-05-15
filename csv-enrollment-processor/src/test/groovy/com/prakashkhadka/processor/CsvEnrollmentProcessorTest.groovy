@@ -105,7 +105,7 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |1,firstName1,lastName1,2,company1
                       |21,firstName21,lastName21,21,company1
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents 'company1.csv', company1CsvContents
+            validateCsvContents 'company1', company1CsvContents
 
         and: 'Should create csv file for company 2'
             def company2CsvContents =
@@ -115,7 +115,7 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |2,firstName2,lastName2,11,company2
                       |46,firstName46,lastName46,46,company2
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents 'company2.csv', company2CsvContents
+            validateCsvContents 'company2', company2CsvContents
 
         and: 'Should create csv file for company 3'
             def company3CsvContents =
@@ -125,7 +125,7 @@ class CsvEnrollmentProcessorTest extends Specification {
                       |4,firstName8,lastName8,6,company3
                       |3,firstName9,lastName9,9,company3
                     """.stripMargin().stripIndent().trim()
-            validateCsvContents 'company3.csv', company3CsvContents
+            validateCsvContents 'company3', company3CsvContents
     }
 
     def 'Processing valid csv file path'() {
