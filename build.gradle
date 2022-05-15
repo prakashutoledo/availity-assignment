@@ -5,12 +5,14 @@ buildscript {
 
         dependencyManagementPluginVersion = '1.0.11.RELEASE'
         modulePluginVersion = '1.8.10'
+        gradleNodePluginVerion = '3.0.1'
     }
 }
 
 plugins {
     id 'io.spring.dependency-management' version "${dependencyManagementPluginVersion}" apply false
     id 'org.javamodularity.moduleplugin' version "${modulePluginVersion}" apply false
+    id "com.github.node-gradle.node" version "${gradleNodePluginVerion}" apply false
 }
 
 allprojects {
@@ -18,9 +20,12 @@ allprojects {
 }
 
 afterEvaluate {
-    subprojects {
+    subprojects { subproject ->
+        if (subproject.name != 'registration-user-interface') {
+            apply plugin: 'org.javamodularity.moduleplugin'
+        }
+
         apply plugin: 'io.spring.dependency-management'
-        apply plugin: 'org.javamodularity.moduleplugin'
 
         repositories {
             mavenCentral()
@@ -43,8 +48,10 @@ afterEvaluate {
         }
 
         test {
-            moduleOptions {
-                runOnClasspath = true
+            if (subproject.name != 'registration-user-interface') {
+                moduleOptions {
+                    runOnClasspath = true
+                }
             }
             useJUnitPlatform()
             testLogging {

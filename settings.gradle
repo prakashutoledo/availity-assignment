@@ -8,7 +8,7 @@ pluginManagement {
     }
 }
 
-['lisp-parenthesis-validator', 'csv-enrollment-processor'].each {
+['lisp-parenthesis-validator', 'csv-enrollment-processor', 'registration-user-interface'].each {
     include it
 }
 rootProject.name = 'availity-assignment'

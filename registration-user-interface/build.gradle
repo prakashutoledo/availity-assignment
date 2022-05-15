@@ -1,0 +1,23 @@
+apply plugin: 'com.github.node-gradle.node'
+
+task bundle(type: NpmTask, dependsOn: [clean, test, npmInstall]) {
+    args = ['run', 'build']
+}
+
+task npmTest(type: NpmTask) {
+    // Don't want to run our test in watch mode waiting for input to finish
+    environment = ['CI': 'true']
+    args = ['run', 'test']
+}
+
+task start(type: NpmTask) {
+    args = ['start']
+}
+
+build.dependsOn tasks.getByName('bundle')
+
+tasks.withType(Test) {
+    dependsOn tasks.getByName('npmTest')
+}
+
+check.dependsOn tasks.getByName('npmTest')
