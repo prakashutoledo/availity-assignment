@@ -16,5 +16,6 @@ jobs:
         with:
           node-version: '16.15.0'
           cache: 'npm'
+          cache-dependency-path: registration-user-interface/package-lock.json
       - name: Gradle test
         run: ./gradlew test
