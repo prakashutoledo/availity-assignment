@@ -19,6 +19,10 @@ allprojects {
     apply plugin: 'groovy'
 }
 
+help {
+    dependsOn ':registration-user-interface:npmHelp'
+}
+
 afterEvaluate {
     subprojects { subproject ->
         if (subproject.name != 'registration-user-interface') {

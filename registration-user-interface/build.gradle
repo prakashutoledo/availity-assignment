@@ -17,14 +17,19 @@ task start(type: NpmTask) {
     args = ['start']
 }
 
-build {
-    dependsOn tasks.getByName('bundle')
+test {
+    dependsOn 'npmTest'
 }
 
-test {
-    dependsOn tasks.getByName('npmTest')
+task npmHelp(type: NpmTask) {
+    description 'Runs `npm help`'
+    args = ['help']
+}
+
+build {
+    dependsOn 'bundle'
 }
 
 check {
-    dependsOn tasks.getByName('npmTest')
+    dependsOn 'npmTest'
 }
