@@ -5,8 +5,7 @@ import axios from 'axios';
 
 const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/;
-const phoneRegex = /[0-9]{10}/;
-const npiRegex = /[0-9]{10}/;
+const max10DigitRegex = /[0-9]{10}/;
 
 export const apiGatewayEndpoint: any = process.env.REACT_APP_AWS_API_GATEWAY_ENDPOINT;
 
@@ -50,8 +49,8 @@ export const RegistrationForm = () => {
                 || phoneError || address1Error || countryError || zipError;
             if (!beDisable) {
                 beDisable = isEmpty(firstName) || isEmpty(lastName) ||
-                    isInvalidMatchedRegex(npi, npiRegex) || isInvalidMatchedRegex(email, emailRegex) ||
-                    isInvalidMatchedRegex(phone, phoneRegex) || isEmpty(address1) || isEmpty(country) ||
+                    isInvalidMatchedRegex(npi, max10DigitRegex) || isInvalidMatchedRegex(email, emailRegex) ||
+                    isInvalidMatchedRegex(phone, max10DigitRegex) || isEmpty(address1) || isEmpty(country) ||
                     isInvalidMatchedRegex(zip, zipRegex);
             }
 
@@ -157,10 +156,8 @@ export const RegistrationForm = () => {
     return (
         <Box
             sx={{
-                marginTop: 8,
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
                 width: '100%',
                 height: '100%'
             }}
@@ -169,7 +166,6 @@ export const RegistrationForm = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center'
             }}>
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
                     <HealthAndSafety />
@@ -179,10 +175,13 @@ export const RegistrationForm = () => {
                 </Typography>
                 <Box sx={{
                     m: 3,
-                    width: '50%',
-                    display: 'inline-flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-evenly',
+                    width: '60%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    '@media (min-width: 1000px)' : {
+                        flexDirection: 'row',
+                        justifyContents: 'center',
+                    },
                     gap: 2
                 }}>
 
@@ -232,7 +231,7 @@ export const RegistrationForm = () => {
                                 name="npi"
                                 value={npi}
                                 onChange={(event) => setNpi(event.target.value)}
-                                onBlur={() => isInvalidMatchedRegexError(npi, setNpiError, npiRegex)}
+                                onBlur={() => isInvalidMatchedRegexError(npi, setNpiError, max10DigitRegex)}
                                 onSelect={() => setNpiError(false)}
                                 error={npiError}
                                 inputProps={{ maxLength: 10 }}
@@ -268,19 +267,29 @@ export const RegistrationForm = () => {
                                 name="phone"
                                 value={phone}
                                 onChange={(event) => setPhone(event.target.value)}
-                                onBlur={() => isInvalidMatchedRegexError(phone, setPhoneError, phoneRegex)}
+                                onBlur={() => isInvalidMatchedRegexError(phone, setPhoneError, max10DigitRegex)}
                                 onSelect={(_) => setPhoneError(false)}
                                 error={phoneError}
                                 helperText={phoneError && "Enter a valid phone number"}
                             />
                         </Grid>
                     </Grid>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} sx={{
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        '@media (min-width: 1000px)' : {
+                            justifyContent: 'flex-end',
+                        },
+                    }}>
                         <Grid item xs={12}>
                             <Typography variant="caption" color="InfoText" id="address">Address</Typography>
                             <Divider />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sx={{
+                            '@media (min-width: 1000px)' : {
+                                mt: '0.5%',
+                            },
+                        }}>
                             <TextField
                                 required
                                 fullWidth
@@ -360,8 +369,6 @@ export const RegistrationForm = () => {
                                 helperText={zipError && "Enter a valid zip"}
                                 inputProps={{ maxLength: 5 }}
                             />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <Button
