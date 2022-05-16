@@ -13,7 +13,7 @@ jar {
     enabled  = false
 }
 
-task npmTest(type: NpmTask) {
+task npmTest(type: NpmTask, dependsOn: test) {
     description 'Runs `npm run test` in non interactive mode'
     // Don't want to run our test in watch mode waiting for input to finish
     environment = ['CI': 'true']
@@ -26,7 +26,7 @@ task start(type: NpmTask) {
 }
 
 test {
-    dependsOn 'npmTest'
+    finalizedBy 'npmTest'
 }
 
 task npmHelp(type: NpmTask) {
@@ -35,7 +35,7 @@ task npmHelp(type: NpmTask) {
 }
 
 build {
-    dependsOn 'bundle'
+    finalizedBy 'bundle'
 }
 
 check {
