@@ -31,6 +31,11 @@ This will build all subprojects and, also run `npm install` followed by `npm run
 ### Candidate Response Answer
 
 My response for the asked question can be found in Microsoft Word Document [response](/response/Khadka_Prakash_Response.docx)
+
+###Github Workflow
+
+This project supports github workflow to run test, build all projects and deploy react production build to AWS S3
+
 ### Working Sample
 
 A sample of react application for project [registration-user-interface](/registration-user-interface) is hosted in AWS S3
