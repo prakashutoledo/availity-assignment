@@ -7,7 +7,7 @@ Availity's FullStack Homework Assignment
 A multi-project gradle project with 3 subprojects listed below
 * [csv-enrollment-processor](/csv-enrollment-processor) A `gradle` project which helps to process enrollment files in CSV format
 * [lisp-parenthesis-validator](/lisp-parenthesis-validator) A `gradle` project which validates Lisp code parenthesis are enclosed
-* [registration-user-interface)](/registration-user-interface) A `React` application with `gradle` tasks to support `npm` tasks which register users
+* [registration-user-interface](/registration-user-interface) A `React` application with `gradle` tasks to support `npm` tasks which register users
 
 Project were written using `Java` with tests written in `Groovy` using `Spock and Junit-5`. 
 React application is written using `TypeScript` with test using `Jest`
@@ -32,7 +32,7 @@ This will build all subprojects and, also run `npm install` followed by `npm run
 
 My response for the asked question can be found in Microsoft Word Document [response](/response/Khadka_Prakash_Response.docx)
 
-###Github Workflow
+### Github Workflow
 
 This project supports github workflow to run test, build all projects and deploy react production build to AWS S3
 
