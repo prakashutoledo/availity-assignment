@@ -45,4 +45,4 @@ This will run `npm start` in development mode
 
 ### Working Sample
 
-[https://registration-form.s3.us-east-2.amazonaws.com/index.html](https://registration-form.s3.us-east-2.amazonaws.com/index.html)
+[https://registration-form.s3.us-east-2.amazonaws.com](https://registration-form.s3.us-east-2.amazonaws.com/index.html)

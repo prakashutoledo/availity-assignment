@@ -1,6 +1,5 @@
 # availity-assignment [![CI](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml/badge.svg)](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml) [![Coverage](.github/badges/jacoco.svg)](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml) [![Branches](.github/badges/branches.svg)](https://github.com/prakashutoledo/availity-assignment/actions/workflows/gradle-npm.yml)
 
-
 Availity's FullStack Homework Assignment
 
 # Getting Started 
@@ -29,7 +28,10 @@ This will clean all builds for all subprojects. For react application it will al
 
 This will build all subprojects and, also run `npm install` followed by `npm run build` for react application
 
+### Candidate Response Answer
+
+My response for the asked question can be found in Microsoft Word Document [response](/response/Khadka_Prakash_Response.docx)
 ### Working Sample
 
 A sample of react application for project [registration-user-interface](/registration-user-interface) is hosted in AWS S3
-which can be access by [https://registration-form.s3.us-east-2.amazonaws.com/index.html](https://registration-form.s3.us-east-2.amazonaws.com/index.html)
+which can be access by [https://registration-form.s3.us-east-2.amazonaws.com](https://registration-form.s3.us-east-2.amazonaws.com/index.html)

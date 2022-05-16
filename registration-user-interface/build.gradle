@@ -17,7 +17,7 @@ task npmTest(type: NpmTask) {
     description 'Runs `npm run test` in non interactive mode'
     // Don't want to run our test in watch mode waiting for input to finish
     environment = ['CI': 'true']
-    args = ['run', 'test']
+    args = ['run', 'test', ]
 }
 
 task start(type: NpmTask) {
