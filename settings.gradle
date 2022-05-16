@@ -1,0 +1,18 @@
+pluginManagement {
+    repositories {
+        if ('useMavenLocal' == 'true') {
+            mavenLocal()
+        }
+
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+
+        mavenCentral()
+    }
+}
+
+['lisp-parenthesis-validator', 'csv-enrollment-processor', 'registration-user-interface'].each {
+    include it
+}
+rootProject.name = 'availity-assignment'

@@ -1,0 +1,47 @@
+apply plugin: 'com.github.node-gradle.node'
+
+task bundle(type: NpmTask, dependsOn: [npmInstall, test]) {
+    description 'Cleans and runs `npm install` followed by `npm run build'
+    args = ['run', 'build']
+}
+
+assemble {
+    enabled  = false
+}
+
+jar {
+    enabled  = false
+}
+
+task npmTest(type: NpmTask) {
+    description 'Runs `npm run test` in non interactive mode'
+    // Don't want to run our test in watch mode waiting for input to finish
+    environment = ['CI': 'true']
+    args = ['run', 'test', ]
+}
+
+task start(type: NpmTask) {
+    description 'Runs `npm start` for server in development mode'
+    args = ['start']
+}
+
+test {
+    dependsOn 'npmTest'
+}
+
+task npmHelp(type: NpmTask) {
+    description 'Runs `npm help`'
+    args = ['help']
+}
+
+build {
+    dependsOn 'bundle'
+}
+
+check {
+    dependsOn 'npmTest'
+}
+
+clean {
+    delete file('node_modules')
+}
