@@ -293,6 +293,7 @@ export const RegistrationForm = () => {
                                 onBlur={() => isEmptyError(address1, setAddress1Error)}
                                 error={address1Error}
                                 helperText={address1Error && "Address line 1 must not be empty."}
+                                margin="dense"
                             />
                         </Grid>
                         <Grid item xs={12}>
