@@ -1,5 +1,5 @@
-import {Avatar, Box, Button, Divider, Grid, Modal, TextField, Typography} from '@mui/material';
-import {HealthAndSafety} from "@mui/icons-material";
+import {Avatar, Box, Button, Dialog, Divider, Grid, IconButton, TextField, Typography,} from '@mui/material';
+import {Close, HealthAndSafety} from "@mui/icons-material";
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 
@@ -167,8 +167,8 @@ export const RegistrationForm = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
             }}>
-                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                    <HealthAndSafety />
+                <Avatar sx={{m: 1, bgcolor: 'secondary.main'}}>
+                    <HealthAndSafety/>
                 </Avatar>
                 <Typography component="h1" variant="h5" id="register">
                     Register
@@ -178,7 +178,7 @@ export const RegistrationForm = () => {
                     width: '60%',
                     display: 'flex',
                     flexDirection: 'column',
-                    '@media (min-width: 1000px)' : {
+                    '@media (min-width: 1000px)': {
                         flexDirection: 'row',
                         justifyContents: 'center',
                     },
@@ -187,8 +187,9 @@ export const RegistrationForm = () => {
 
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <Typography variant="caption" color="InfoText" id="personalInformation">Personal Information</Typography>
-                            <Divider />
+                            <Typography variant="caption" color="InfoText" id="personalInformation">Personal
+                                Information</Typography>
+                            <Divider/>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -234,13 +235,14 @@ export const RegistrationForm = () => {
                                 onBlur={() => isInvalidMatchedRegexError(npi, setNpiError, max10DigitRegex)}
                                 onSelect={() => setNpiError(false)}
                                 error={npiError}
-                                inputProps={{ maxLength: 10 }}
+                                inputProps={{maxLength: 10, inputMode: 'numeric', pattern: '[0-9]*'}}
                                 helperText={npiError && "Enter a valid 10 digit NPI number"}
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="caption" color="InfoText" id="contactInformation">Contact Information</Typography>
-                            <Divider />
+                            <Typography variant="caption" color="InfoText" id="contactInformation">Contact
+                                Information</Typography>
+                            <Divider/>
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
@@ -252,7 +254,9 @@ export const RegistrationForm = () => {
                                 value={email}
                                 autoComplete="email"
                                 onChange={(event) => setEmail(event.target.value)}
-                                onSelect={() => { setEmailError(false); }}
+                                onSelect={() => {
+                                    setEmailError(false);
+                                }}
                                 error={emailError}
                                 helperText={emailError && "Enter a valid email address"}
                                 onBlur={() => isInvalidMatchedRegexError(email, setEmailError, emailRegex)}
@@ -270,23 +274,24 @@ export const RegistrationForm = () => {
                                 onBlur={() => isInvalidMatchedRegexError(phone, setPhoneError, max10DigitRegex)}
                                 onSelect={(_) => setPhoneError(false)}
                                 error={phoneError}
-                                helperText={phoneError && "Enter a valid phone number"}
+                                inputProps={{maxLength: 10, inputMode: 'numeric', pattern: '[0-9]*'}}
+                                helperText={phoneError && "Enter a valid 10 digit phone number"}
                             />
                         </Grid>
                     </Grid>
                     <Grid container spacing={2} sx={{
                         alignItems: 'center',
                         justifyContent: 'center',
-                        '@media (min-width: 1000px)' : {
+                        '@media (min-width: 1000px)': {
                             justifyContent: 'flex-end',
                         },
                     }}>
                         <Grid item xs={12}>
                             <Typography variant="caption" color="InfoText" id="address">Address</Typography>
-                            <Divider />
+                            <Divider/>
                         </Grid>
                         <Grid item xs={12} sx={{
-                            '@media (min-width: 1000px)' : {
+                            '@media (min-width: 1000px)': {
                                 mt: '0.5%',
                             },
                         }}>
@@ -367,7 +372,7 @@ export const RegistrationForm = () => {
                                 onSelect={() => setZipError(false)}
                                 error={zipError}
                                 helperText={zipError && "Enter a valid zip"}
-                                inputProps={{ maxLength: 5 }}
+                                inputProps={{maxLength: 5}}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -375,7 +380,7 @@ export const RegistrationForm = () => {
                                 id="submitRegistration"
                                 fullWidth
                                 variant="contained"
-                                sx={{ mt: 3, mb: 2 }}
+                                sx={{mt: 3, mb: 2}}
                                 disabled={registerButtonDisabled}
                                 onClick={() => submitRegistration()}
                             >
@@ -383,33 +388,31 @@ export const RegistrationForm = () => {
                             </Button>
                         </Grid>
                     </Grid>
-
                 </Box>
 
-                <Modal
+                <Dialog
                     open={modalOpen}
-                    onClose={() => handleModalClose()}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
+                    aria-labelledby="api-gateway-request-dialog-title"
+                    aria-describedby="api-gateway-request-dialog-description"
+                    id='apigateway-request-dialog'
                 >
-                    <Box sx={{
-                        position: 'absolute' as 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: 'background.paper',
-                        boxShadow: 24,
-                        p: 4,
+                    <Grid id="api-gateway-request-dialog-title" container sx={{
+                        pl: 1, pt: 0, pr: 0,
+                        display: 'flex',
+                        direction: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                     }}>
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            API Gateway Request Id
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            {requestId}
-                        </Typography>
-                    </Box>
-                </Modal>
+                        <Typography variant="h6" component="h2">API Gateway Request Id</Typography>
+                        <IconButton id='apigateway-request-dialog-close' size={'small'} onClick={handleModalClose}>
+                            <Close/>
+                        </IconButton>
+                    </Grid>
+
+                    <Typography id="api-gateway-request-dialog-description" sx={{m: 6, textAlign: 'center'}}>
+                        {requestId}
+                    </Typography>
+                </Dialog>
             </Box>
         </Box>
     );

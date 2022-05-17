@@ -53,23 +53,23 @@ describe('Should rendered basic html element', () => {
     });
 
     it('Should have rendered submit button', () => {
-        expectButton('Register', true)
+        expectRegisterButton(true)
     });
 });
 
 describe('Validating text input fields', () => {
     it.each`
-        textInputId    | error                                   | invalidText | validText
-        ${"firstName"} | ${"First name must not be empty."}      | ${"    "}   | ${"Prakash"}
-        ${"lastName"}  | ${"Last name must not be empty."}       | ${"    "}   | ${"Khadka"}
-        ${"npi"}       | ${"Enter a valid 10 digit NPI number"}  | ${"130p"}   | ${"1234567890"}
-        ${"phone"}     | ${"Enter a valid phone number"}         | ${"157807"} | ${"+14194077621"}
-        ${"email"}     | ${"Enter a valid email address"}        | ${"not"}    | ${"name@domain.com"}
-        ${"address1"}  | ${"Address line 1 must not be empty."}  | ${"    "}   | ${"Somewhere"}
-        ${"country"}   | ${"Country must not be empty."}         | ${"    "}   | ${"Country"}
-        ${"zip"}       | ${"Enter a valid zip"}                  | ${"123"}    | ${"43607"}
+        textInputId    | error                                    | invalidText | validText
+        ${"firstName"} | ${"First name must not be empty."}       | ${"    "}   | ${"Prakash"}
+        ${"lastName"}  | ${"Last name must not be empty."}        | ${"    "}   | ${"Khadka"}
+        ${"npi"}       | ${"Enter a valid 10 digit NPI number"}   | ${"130p"}   | ${"1234567890"}
+        ${"phone"}     | ${"Enter a valid 10 digit phone number"} | ${"157807"} | ${"+14194077621"}
+        ${"email"}     | ${"Enter a valid email address"}         | ${"not"}    | ${"name@domain.com"}
+        ${"address1"}  | ${"Address line 1 must not be empty."}   | ${"    "}   | ${"Somewhere"}
+        ${"country"}   | ${"Country must not be empty."}          | ${"    "}   | ${"Country"}
+        ${"zip"}       | ${"Enter a valid zip"}                   | ${"123"}    | ${"43607"}
     `("Should validate input: $textInputId with errorText: $error", ({textInputId, error, invalidText, validText}) => {
-        const input = expectSelectFocus(textInputId)
+        const input = expectSelectFocus(textInputId, true)
         expectAct(() => input?.blur());
         expect(input).not.toHaveFocus()
         expectErrorText(textInputId, error);
@@ -95,31 +95,70 @@ describe('Validating text input fields', () => {
 });
 
 describe('Should validate register button', () => {
-    it('Submit button should be disabled for first rendering', () => {
-        const submitButton = document.getElementById("submitRegistration");
-        expect(submitButton).toBeInTheDocument();
-        expect(submitButton).toBeDisabled()
-    });
+    let mockAxios: MockAdapter;
+    beforeAll(() => mockAxios = new MockAdapter(axios))
+
+    afterEach(() => mockAxios.reset())
 
     it('Should simulate disable property of button based on text input property', () => {
         // All required fields are valid except zip
-        const {submitButton , zipInput} = expectVisibleButton(true);
-        expect(submitButton).toBeDisabled();
+        const {zip} = expectVisibleButton(true);
+        expectRegisterButton(true)
 
         expectAct(() => {
-            fireChangeEventWithValue(zipInput, "43607");
+            fireChangeEventWithValue(zip, "43607");
         })
 
         // All required fields are valid
-        expect(submitButton).not.toBeDisabled()
+        expectRegisterButton()
     })
 
-
-    it('Should submit aws api gateway request on visible button is clicked with', async ()  => {
-        let mockAxios = new MockAdapter(axios);
-        const {submitButton} = expectVisibleButton(false);
-
+    it('Should submit aws api gateway request with success request id description', async ()  => {
+        // Mock actual request
         mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id"});
+        // Should open dialog
+        await expectDialog('fake-request-id')
+
+        // Wait for dialog close by invoking close icon
+        await act(async () => {
+            fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
+        });
+    });
+
+    it('Should submit aws api gateway request with dialog network error description', async ()  => {
+        mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce()
+        // Should open dialog
+        await expectDialog('Unable to post registration')
+
+        // Wait for dialog close by invoking close icon
+        await act(async () => {
+            fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
+        });
+    });
+
+    it('Should close dialog and empty all the inputs on close icon clicked event', async ()  => {
+        mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id-2"});
+        const submitButton = await expectDialog('fake-request-id-2')
+
+        // Wait for dialog close by invoking close icon
+        await act(async () => {
+            fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
+        });
+
+        // Should disable the registration button and should empty all input
+        await waitFor(() => {
+            expect(submitButton).toBeDisabled();
+            expectEmptyInputs();
+        })
+    });
+
+    /**
+     * Excepts dialog with given title to have given description
+     *
+     * @param description a description of the modal
+     */
+    const expectDialog =  async (description: string) => {
+        const {submitButton} = expectVisibleButton(false);
 
         // Can't use expectAct here, as expectAct is synchronous process and will not wait for all state change event
         // to be capture in act. Either make expectAct to be async and await it for act call back or call act explicitly
@@ -128,49 +167,33 @@ describe('Should validate register button', () => {
             fireEvent.click(submitButton!);
         });
 
-        await waitFor(() => {
-            expect(mockAxios.history.post[0].url).toBe(apiGatewayEndpoint)
-            expect(JSON.parse(mockAxios.history.post[0].data)).toStrictEqual({
-                    firstName: "first name",
-                    lastname: "last name",
-                    npi: "0123456789",
-                    phone: "+4194088765",
-                    email: "name@domain.com",
-                    address1: "1845 some street",
-                    address2: "",
-                    city: "",
-                    country: "Some country",
-                    state: "",
-                    zip: "43607"
-                }
-            );
-
-            expectModal('API Gateway Request Id', 'fake-request-id')
+        expect(mockAxios.history.post[0].url).toBe(apiGatewayEndpoint)
+        expect(JSON.parse(mockAxios.history.post[0].data)).toStrictEqual({
+            firstName: "first name",
+            lastname: "last name",
+            npi: "0123456789",
+            phone: "+4194088765",
+            email: "name@domain.com",
+            address1: "1845 some street",
+            address2: "address 2",
+            city: "Some city",
+            country: "Some country",
+            state: "Some state",
+            zip: "43607"
         });
-
-        mockAxios.reset()
-        mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce();
 
         await act(async () => {
             fireEvent.click(submitButton!);
         });
 
         await waitFor(() => {
-            expectModal('API Gateway Request Id', 'Unable to post registration')
+            expect(document.getElementById('api-gateway-request-dialog-title')?.textContent).toBe('API Gateway Request Id');
+            expect(document.getElementById('api-gateway-request-dialog-description')?.textContent).toBe(description);
         });
-    });
-});
 
-/**
- * Excepts modal with given title to have given description
- *
- * @param title a title of the modal
- * @param description a description of the modal
- */
-const expectModal = (title: string, description: string) => {
-    expect(document.body?.querySelector('#modal-modal-title')?.textContent).toBe(title);
-    expect(document.body?.querySelector('#modal-modal-description')?.textContent).toBe(description);
-};
+        return submitButton
+    };
+});
 
 /**
  * Expects the given selector element to be in the document
@@ -203,9 +226,12 @@ const expectDataTestId = (testId: string, attributes: Map<string, string> = new 
 
 /**
  * Expects the given html element id label name to match given
+ *
  * @param labelId a html element id
  * @param expected an expected value of context text of the element matching given id
  * @param required checks if label is mark required or not
+ *
+ * @returns the html element with that label id
  */
 const expectLabel = (labelId: string, expected: string, required: boolean = false) => {
     const element = expectSelector(`#${labelId}`)
@@ -242,18 +268,17 @@ const expectRequired = (element: Element | null | undefined, expected: string) =
 
 /**
  * Expects the html button to have given label and checks if it is disabled or not
- * @param expectedLabel an expected label name of button
  * @param disabled checks if button is disabled or not
  */
-const expectButton = (expectedLabel: string, disabled: boolean = false) => {
-    const button = expectSelector('button')
+const expectRegisterButton = (disabled: boolean = false) => {
+    const registerButton = expectSelector('#submitRegistration')
     if (disabled) {
-        expect(button).toBeDisabled()
+        expect(registerButton).toBeDisabled()
     }
     else {
-        expect(button).not.toBeDisabled()
+        expect(registerButton).not.toBeDisabled()
     }
-    expectRequired(button, expectedLabel)
+    expectRequired(registerButton, 'Register')
 };
 
 /**
@@ -270,15 +295,21 @@ const expectAct = (callback: () => void | undefined = () => ReactDOM.createRoot(
 /**
  * Expects the given html input element id to be focused when firing focus event. This will also expects
  * helper text to be invisible while focusing the element
+ *
  * @param textInputId a html input element id
+ * @param checkFocus a flag to check focus property of the given input element
+ *
+ * @returns the text field input with given id
  */
-const expectSelectFocus = (textInputId : string) => {
+const expectSelectFocus = (textInputId : string, checkFocus: boolean = false) => {
     const input = document.getElementById(textInputId);
-    expectAct(() => input?.focus());
-    expect(input).toHaveFocus();
-    expectErrorText(textInputId);
-    let errorText = container?.querySelector(`#${textInputId}-helper-text`);
-    expect(errorText).toBeNull();
+    if (checkFocus) {
+        expectAct(() => input?.focus());
+        expect(input).toHaveFocus();
+        expectErrorText(textInputId);
+        let errorText = container?.querySelector(`#${textInputId}-helper-text`);
+        expect(errorText).toBeNull();
+    }
     return input;
 };
 
@@ -319,26 +350,55 @@ const fireChangeEventWithValue = (element: HTMLElement | null, value: string) =>
  * @returns submit button and zip input html element
  */
 const expectVisibleButton = (failOne: boolean) => {
-    const submitButton = document.getElementById("submitRegistration");
-    const firstNameInput = expectSelectFocus("firstName");
-    const lastNameInput = expectSelectFocus("lastName");
-    const emailInput = expectSelectFocus("email");
-    const npiInput = expectSelectFocus("npi");
-    const phoneInput = expectSelectFocus("phone");
-    const address1Input = expectSelectFocus("address1");
-    const zipInput = expectSelectFocus("zip");
-    const countryInput = expectSelectFocus("country");
+    const submitButton = document.getElementById('submitRegistration')
+    const textInputs = {...inputs()};
+    const zip = textInputs.zip;
 
     expectAct(() => {
-        fireChangeEventWithValue(firstNameInput, "first name");
-        fireChangeEventWithValue(lastNameInput, "last name");
-        fireChangeEventWithValue(emailInput, "name@domain.com");
-        fireChangeEventWithValue(npiInput, "0123456789");
-        fireChangeEventWithValue(phoneInput, "+4194088765");
-        fireChangeEventWithValue(address1Input, "1845 some street");
-        fireChangeEventWithValue(countryInput, "Some country");
-        fireChangeEventWithValue(zipInput, failOne ? "4360" : "43607");
+        fireChangeEventWithValue(textInputs.firstName, "first name");
+        fireChangeEventWithValue(textInputs.lastName, "last name");
+        fireChangeEventWithValue(textInputs.email, "name@domain.com");
+        fireChangeEventWithValue(textInputs.npi, "0123456789");
+        fireChangeEventWithValue(textInputs.phone, "+4194088765");
+        fireChangeEventWithValue(textInputs.address1, "1845 some street");
+        fireChangeEventWithValue(textInputs.address2, "address 2");
+        fireChangeEventWithValue(textInputs.country, "Some country");
+        fireChangeEventWithValue(textInputs.city, "Some city");
+        fireChangeEventWithValue(textInputs.state, "Some state");
+        fireChangeEventWithValue(zip, failOne ? "4360" : "43607");
     });
 
-    return { submitButton, zipInput }
+    return { submitButton, zip }
+}
+
+/**
+ * Expects all the text field input value to be empty string
+ */
+const expectEmptyInputs = () => {
+    Object.entries(inputs()).forEach(([,input]) => {
+        expect(input).toHaveValue("")
+    })
+}
+
+/**
+ * Get all the text field inputs
+ *
+ * @returns all available text field input
+ */
+const inputs = () => {
+    const firstName = expectSelectFocus("firstName");
+    const lastName = expectSelectFocus("lastName");
+    const email = expectSelectFocus("email");
+    const npi = expectSelectFocus("npi");
+    const phone = expectSelectFocus("phone");
+    const address1 = expectSelectFocus("address1");
+    const address2 = expectSelectFocus('address2')
+    const city = expectSelectFocus('city')
+    const state = expectSelectFocus('state')
+    const zip = expectSelectFocus("zip");
+    const country = expectSelectFocus("country");
+
+    return {
+        firstName, lastName, email, npi, phone, address1, address2, city, state, zip, country
+    }
 }

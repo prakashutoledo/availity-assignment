@@ -1,4 +1,3 @@
-import React from 'react';
 import {createRoot} from 'react-dom/client';
 import Application from './application';
 import {act} from "react-dom/test-utils";
