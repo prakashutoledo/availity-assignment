@@ -59,17 +59,17 @@ describe('Should rendered basic html element', () => {
 
 describe('Validating text input fields', () => {
     it.each`
-        textInputId    | error                                   | invalidText | validText
-        ${"firstName"} | ${"First name must not be empty."}      | ${"    "}   | ${"Prakash"}
-        ${"lastName"}  | ${"Last name must not be empty."}       | ${"    "}   | ${"Khadka"}
-        ${"npi"}       | ${"Enter a valid 10 digit NPI number"}  | ${"130p"}   | ${"1234567890"}
-        ${"phone"}     | ${"Enter a valid phone number"}         | ${"157807"} | ${"+14194077621"}
-        ${"email"}     | ${"Enter a valid email address"}        | ${"not"}    | ${"name@domain.com"}
-        ${"address1"}  | ${"Address line 1 must not be empty."}  | ${"    "}   | ${"Somewhere"}
-        ${"country"}   | ${"Country must not be empty."}         | ${"    "}   | ${"Country"}
-        ${"zip"}       | ${"Enter a valid zip"}                  | ${"123"}    | ${"43607"}
+        textInputId    | error                                    | invalidText | validText
+        ${"firstName"} | ${"First name must not be empty."}       | ${"    "}   | ${"Prakash"}
+        ${"lastName"}  | ${"Last name must not be empty."}        | ${"    "}   | ${"Khadka"}
+        ${"npi"}       | ${"Enter a valid 10 digit NPI number"}   | ${"130p"}   | ${"1234567890"}
+        ${"phone"}     | ${"Enter a valid 10 digit phone number"} | ${"157807"} | ${"+14194077621"}
+        ${"email"}     | ${"Enter a valid email address"}         | ${"not"}    | ${"name@domain.com"}
+        ${"address1"}  | ${"Address line 1 must not be empty."}   | ${"    "}   | ${"Somewhere"}
+        ${"country"}   | ${"Country must not be empty."}          | ${"    "}   | ${"Country"}
+        ${"zip"}       | ${"Enter a valid zip"}                   | ${"123"}    | ${"43607"}
     `("Should validate input: $textInputId with errorText: $error", ({textInputId, error, invalidText, validText}) => {
-        const input = expectSelectFocus(textInputId)
+        const input = expectSelectFocus(textInputId, true)
         expectAct(() => input?.blur());
         expect(input).not.toHaveFocus()
         expectErrorText(textInputId, error);
@@ -98,35 +98,58 @@ describe('Should validate register button', () => {
     let mockAxios: MockAdapter;
     beforeAll(() => mockAxios = new MockAdapter(axios))
 
-    afterEach(() => mockAxios.reset());
+    afterEach(() => mockAxios.reset())
 
     it('Should simulate disable property of button based on text input property', () => {
         // All required fields are valid except zip
-        const {zipInput} = expectVisibleButton(true);
+        const {zip} = expectVisibleButton(true);
         expectRegisterButton(true)
 
         expectAct(() => {
-            fireChangeEventWithValue(zipInput, "43607");
+            fireChangeEventWithValue(zip, "43607");
         })
 
         // All required fields are valid
         expectRegisterButton()
     })
 
-    it('Should submit aws api gateway request on visible button is clicked with', async ()  => {
+    it('Should submit aws api gateway request with success request id description', async ()  => {
+        // Mock actual request
         mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id"});
-        const submitButton = await expectDialog('fake-request-id')
+        // Should open dialog
+        await expectDialog('fake-request-id')
+
+        // Wait for dialog close by invoking close icon
         await act(async () => {
             fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
         });
-        await waitFor(() => {
-            expect(submitButton).toBeDisabled()
-        })
     });
 
-    it('Should submit aws api gateway request with dialog network error description ', async ()  => {
+    it('Should submit aws api gateway request with dialog network error description', async ()  => {
         mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce()
+        // Should open dialog
         await expectDialog('Unable to post registration')
+
+        // Wait for dialog close by invoking close icon
+        await act(async () => {
+            fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
+        });
+    });
+
+    it('Should close dialog and empty all the inputs on close icon clicked event', async ()  => {
+        mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id-2"});
+        const submitButton = await expectDialog('fake-request-id-2')
+
+        // Wait for dialog close by invoking close icon
+        await act(async () => {
+            fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
+        });
+
+        // Should disable the registration button and should empty all input
+        await waitFor(() => {
+            expect(submitButton).toBeDisabled();
+            expectEmptyInputs();
+        })
     });
 
     /**
@@ -203,9 +226,12 @@ const expectDataTestId = (testId: string, attributes: Map<string, string> = new 
 
 /**
  * Expects the given html element id label name to match given
+ *
  * @param labelId a html element id
  * @param expected an expected value of context text of the element matching given id
  * @param required checks if label is mark required or not
+ *
+ * @returns the html element with that label id
  */
 const expectLabel = (labelId: string, expected: string, required: boolean = false) => {
     const element = expectSelector(`#${labelId}`)
@@ -269,15 +295,21 @@ const expectAct = (callback: () => void | undefined = () => ReactDOM.createRoot(
 /**
  * Expects the given html input element id to be focused when firing focus event. This will also expects
  * helper text to be invisible while focusing the element
+ *
  * @param textInputId a html input element id
+ * @param checkFocus a flag to check focus property of the given input element
+ *
+ * @returns the text field input with given id
  */
-const expectSelectFocus = (textInputId : string) => {
+const expectSelectFocus = (textInputId : string, checkFocus: boolean = false) => {
     const input = document.getElementById(textInputId);
-    expectAct(() => input?.focus());
-    expect(input).toHaveFocus();
-    expectErrorText(textInputId);
-    let errorText = container?.querySelector(`#${textInputId}-helper-text`);
-    expect(errorText).toBeNull();
+    if (checkFocus) {
+        expectAct(() => input?.focus());
+        expect(input).toHaveFocus();
+        expectErrorText(textInputId);
+        let errorText = container?.querySelector(`#${textInputId}-helper-text`);
+        expect(errorText).toBeNull();
+    }
     return input;
 };
 
@@ -318,32 +350,55 @@ const fireChangeEventWithValue = (element: HTMLElement | null, value: string) =>
  * @returns submit button and zip input html element
  */
 const expectVisibleButton = (failOne: boolean) => {
-    const submitButton = document.getElementById("submitRegistration");
-    const firstNameInput = expectSelectFocus("firstName");
-    const lastNameInput = expectSelectFocus("lastName");
-    const emailInput = expectSelectFocus("email");
-    const npiInput = expectSelectFocus("npi");
-    const phoneInput = expectSelectFocus("phone");
-    const address1Input = expectSelectFocus("address1");
-    const address2Input = expectSelectFocus('address2')
-    const city = expectSelectFocus('city')
-    const state = expectSelectFocus('state')
-    const zipInput = expectSelectFocus("zip");
-    const countryInput = expectSelectFocus("country");
+    const submitButton = document.getElementById('submitRegistration')
+    const textInputs = {...inputs()};
+    const zip = textInputs.zip;
 
     expectAct(() => {
-        fireChangeEventWithValue(firstNameInput, "first name");
-        fireChangeEventWithValue(lastNameInput, "last name");
-        fireChangeEventWithValue(emailInput, "name@domain.com");
-        fireChangeEventWithValue(npiInput, "0123456789");
-        fireChangeEventWithValue(phoneInput, "+4194088765");
-        fireChangeEventWithValue(address1Input, "1845 some street");
-        fireChangeEventWithValue(address2Input, "address 2");
-        fireChangeEventWithValue(countryInput, "Some country");
-        fireChangeEventWithValue(city, "Some city");
-        fireChangeEventWithValue(state, "Some state");
-        fireChangeEventWithValue(zipInput, failOne ? "4360" : "43607");
+        fireChangeEventWithValue(textInputs.firstName, "first name");
+        fireChangeEventWithValue(textInputs.lastName, "last name");
+        fireChangeEventWithValue(textInputs.email, "name@domain.com");
+        fireChangeEventWithValue(textInputs.npi, "0123456789");
+        fireChangeEventWithValue(textInputs.phone, "+4194088765");
+        fireChangeEventWithValue(textInputs.address1, "1845 some street");
+        fireChangeEventWithValue(textInputs.address2, "address 2");
+        fireChangeEventWithValue(textInputs.country, "Some country");
+        fireChangeEventWithValue(textInputs.city, "Some city");
+        fireChangeEventWithValue(textInputs.state, "Some state");
+        fireChangeEventWithValue(zip, failOne ? "4360" : "43607");
     });
 
-    return { submitButton, zipInput }
+    return { submitButton, zip }
+}
+
+/**
+ * Expects all the text field input value to be empty string
+ */
+const expectEmptyInputs = () => {
+    Object.entries(inputs()).forEach(([,input]) => {
+        expect(input).toHaveValue("")
+    })
+}
+
+/**
+ * Get all the text field inputs
+ *
+ * @returns all available text field input
+ */
+const inputs = () => {
+    const firstName = expectSelectFocus("firstName");
+    const lastName = expectSelectFocus("lastName");
+    const email = expectSelectFocus("email");
+    const npi = expectSelectFocus("npi");
+    const phone = expectSelectFocus("phone");
+    const address1 = expectSelectFocus("address1");
+    const address2 = expectSelectFocus('address2')
+    const city = expectSelectFocus('city')
+    const state = expectSelectFocus('state')
+    const zip = expectSelectFocus("zip");
+    const country = expectSelectFocus("country");
+
+    return {
+        firstName, lastName, email, npi, phone, address1, address2, city, state, zip, country
+    }
 }

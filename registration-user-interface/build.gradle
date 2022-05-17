@@ -14,10 +14,10 @@ jar {
 }
 
 task npmTest(type: NpmTask, dependsOn: test) {
-    description 'Runs `npm run test` in non interactive mode'
+    description 'Runs `CI=true npm run test -- --coverage` in non interactive mode'
     // Don't want to run our test in watch mode waiting for input to finish
     environment = ['CI': 'true']
-    args = ['run', 'test', ]
+    args = ['run', 'test', '--', '--coverage']
 }
 
 task start(type: NpmTask) {
