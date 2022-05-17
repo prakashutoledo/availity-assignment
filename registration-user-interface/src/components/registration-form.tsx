@@ -1,5 +1,5 @@
-import {Avatar, Box, Button, Divider, Grid, Modal, TextField, Typography} from '@mui/material';
-import {HealthAndSafety} from "@mui/icons-material";
+import {Avatar, Box, Button, Dialog, Divider, Grid, IconButton, TextField, Typography,} from '@mui/material';
+import {Close, HealthAndSafety} from "@mui/icons-material";
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 
@@ -234,7 +234,7 @@ export const RegistrationForm = () => {
                                 onBlur={() => isInvalidMatchedRegexError(npi, setNpiError, max10DigitRegex)}
                                 onSelect={() => setNpiError(false)}
                                 error={npiError}
-                                inputProps={{ maxLength: 10 }}
+                                inputProps={{ maxLength: 10, inputMode: 'numeric', pattern: '[0-9]*' }}
                                 helperText={npiError && "Enter a valid 10 digit NPI number"}
                             />
                         </Grid>
@@ -270,6 +270,7 @@ export const RegistrationForm = () => {
                                 onBlur={() => isInvalidMatchedRegexError(phone, setPhoneError, max10DigitRegex)}
                                 onSelect={(_) => setPhoneError(false)}
                                 error={phoneError}
+                                inputProps={{ maxLength: 10, inputMode: 'numeric', pattern: '[0-9]*' }}
                                 helperText={phoneError && "Enter a valid phone number"}
                             />
                         </Grid>
@@ -386,30 +387,29 @@ export const RegistrationForm = () => {
 
                 </Box>
 
-                <Modal
+                <Dialog
                     open={modalOpen}
-                    onClose={() => handleModalClose()}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
+                    aria-labelledby="api-gateway-request-dialog-title"
+                    aria-describedby="api-gateway-request-dialog-description"
+                    id='apigateway-request-dialog'
                 >
-                    <Box sx={{
-                        position: 'absolute' as 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: 'background.paper',
-                        boxShadow: 24,
-                        p: 4,
+                    <Grid id="api-gateway-request-dialog-title" container sx={{
+                        pl: 1, pt: 0, pr: 0,
+                        display: 'flex',
+                        direction: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
                     }}>
-                        <Typography id="modal-modal-title" variant="h6" component="h2">
-                            API Gateway Request Id
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            {requestId}
-                        </Typography>
-                    </Box>
-                </Modal>
+                        <Typography variant="h6" component="h2">API Gateway Request Id</Typography>
+                        <IconButton id='apigateway-request-dialog-close' size={'small'} onClick={handleModalClose}>
+                            <Close/>
+                        </IconButton>
+                    </Grid>
+
+                    <Typography id="api-gateway-request-dialog-description" sx={{ m: 6, textAlign: 'center'}}>
+                        {requestId}
+                    </Typography>
+                </Dialog>
             </Box>
         </Box>
     );

@@ -53,7 +53,7 @@ describe('Should rendered basic html element', () => {
     });
 
     it('Should have rendered submit button', () => {
-        expectButton('Register', true)
+        expectRegisterButton(true)
     });
 });
 
@@ -95,31 +95,47 @@ describe('Validating text input fields', () => {
 });
 
 describe('Should validate register button', () => {
-    it('Submit button should be disabled for first rendering', () => {
-        const submitButton = document.getElementById("submitRegistration");
-        expect(submitButton).toBeInTheDocument();
-        expect(submitButton).toBeDisabled()
-    });
+    let mockAxios: MockAdapter;
+    beforeAll(() => mockAxios = new MockAdapter(axios))
+
+    afterEach(() => mockAxios.reset());
 
     it('Should simulate disable property of button based on text input property', () => {
         // All required fields are valid except zip
-        const {submitButton , zipInput} = expectVisibleButton(true);
-        expect(submitButton).toBeDisabled();
+        const {zipInput} = expectVisibleButton(true);
+        expectRegisterButton(true)
 
         expectAct(() => {
             fireChangeEventWithValue(zipInput, "43607");
         })
 
         // All required fields are valid
-        expect(submitButton).not.toBeDisabled()
+        expectRegisterButton()
     })
 
-
     it('Should submit aws api gateway request on visible button is clicked with', async ()  => {
-        let mockAxios = new MockAdapter(axios);
-        const {submitButton} = expectVisibleButton(false);
-
         mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id"});
+        const submitButton = await expectDialog('fake-request-id')
+        await act(async () => {
+            fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
+        });
+        await waitFor(() => {
+            expect(submitButton).toBeDisabled()
+        })
+    });
+
+    it('Should submit aws api gateway request with dialog network error description ', async ()  => {
+        mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce()
+        await expectDialog('Unable to post registration')
+    });
+
+    /**
+     * Excepts dialog with given title to have given description
+     *
+     * @param description a description of the modal
+     */
+    const expectDialog =  async (description: string) => {
+        const {submitButton} = expectVisibleButton(false);
 
         // Can't use expectAct here, as expectAct is synchronous process and will not wait for all state change event
         // to be capture in act. Either make expectAct to be async and await it for act call back or call act explicitly
@@ -128,49 +144,33 @@ describe('Should validate register button', () => {
             fireEvent.click(submitButton!);
         });
 
-        await waitFor(() => {
-            expect(mockAxios.history.post[0].url).toBe(apiGatewayEndpoint)
-            expect(JSON.parse(mockAxios.history.post[0].data)).toStrictEqual({
-                    firstName: "first name",
-                    lastname: "last name",
-                    npi: "0123456789",
-                    phone: "+4194088765",
-                    email: "name@domain.com",
-                    address1: "1845 some street",
-                    address2: "",
-                    city: "",
-                    country: "Some country",
-                    state: "",
-                    zip: "43607"
-                }
-            );
-
-            expectModal('API Gateway Request Id', 'fake-request-id')
+        expect(mockAxios.history.post[0].url).toBe(apiGatewayEndpoint)
+        expect(JSON.parse(mockAxios.history.post[0].data)).toStrictEqual({
+            firstName: "first name",
+            lastname: "last name",
+            npi: "0123456789",
+            phone: "+4194088765",
+            email: "name@domain.com",
+            address1: "1845 some street",
+            address2: "address 2",
+            city: "Some city",
+            country: "Some country",
+            state: "Some state",
+            zip: "43607"
         });
-
-        mockAxios.reset()
-        mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce();
 
         await act(async () => {
             fireEvent.click(submitButton!);
         });
 
         await waitFor(() => {
-            expectModal('API Gateway Request Id', 'Unable to post registration')
+            expect(document.getElementById('api-gateway-request-dialog-title')?.textContent).toBe('API Gateway Request Id');
+            expect(document.getElementById('api-gateway-request-dialog-description')?.textContent).toBe(description);
         });
-    });
-});
 
-/**
- * Excepts modal with given title to have given description
- *
- * @param title a title of the modal
- * @param description a description of the modal
- */
-const expectModal = (title: string, description: string) => {
-    expect(document.body?.querySelector('#modal-modal-title')?.textContent).toBe(title);
-    expect(document.body?.querySelector('#modal-modal-description')?.textContent).toBe(description);
-};
+        return submitButton
+    };
+});
 
 /**
  * Expects the given selector element to be in the document
@@ -242,18 +242,17 @@ const expectRequired = (element: Element | null | undefined, expected: string) =
 
 /**
  * Expects the html button to have given label and checks if it is disabled or not
- * @param expectedLabel an expected label name of button
  * @param disabled checks if button is disabled or not
  */
-const expectButton = (expectedLabel: string, disabled: boolean = false) => {
-    const button = expectSelector('button')
+const expectRegisterButton = (disabled: boolean = false) => {
+    const registerButton = expectSelector('#submitRegistration')
     if (disabled) {
-        expect(button).toBeDisabled()
+        expect(registerButton).toBeDisabled()
     }
     else {
-        expect(button).not.toBeDisabled()
+        expect(registerButton).not.toBeDisabled()
     }
-    expectRequired(button, expectedLabel)
+    expectRequired(registerButton, 'Register')
 };
 
 /**
@@ -326,6 +325,9 @@ const expectVisibleButton = (failOne: boolean) => {
     const npiInput = expectSelectFocus("npi");
     const phoneInput = expectSelectFocus("phone");
     const address1Input = expectSelectFocus("address1");
+    const address2Input = expectSelectFocus('address2')
+    const city = expectSelectFocus('city')
+    const state = expectSelectFocus('state')
     const zipInput = expectSelectFocus("zip");
     const countryInput = expectSelectFocus("country");
 
@@ -336,7 +338,10 @@ const expectVisibleButton = (failOne: boolean) => {
         fireChangeEventWithValue(npiInput, "0123456789");
         fireChangeEventWithValue(phoneInput, "+4194088765");
         fireChangeEventWithValue(address1Input, "1845 some street");
+        fireChangeEventWithValue(address2Input, "address 2");
         fireChangeEventWithValue(countryInput, "Some country");
+        fireChangeEventWithValue(city, "Some city");
+        fireChangeEventWithValue(state, "Some state");
         fireChangeEventWithValue(zipInput, failOne ? "4360" : "43607");
     });
 
