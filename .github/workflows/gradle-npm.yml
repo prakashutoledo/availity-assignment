@@ -26,10 +26,7 @@ jobs:
           cache-dependency-path: registration-user-interface/package-lock.json
 
       - name: 'Install npm dependencies'
-        run: |
-          cd ./registration-user-interface
-          npm install
-          cd ../
+        run:  (cd -- ./registration-user-interface && npm install)
 
       - name: Run Gradle and npm tests
         run: ./gradlew test --no-daemon
