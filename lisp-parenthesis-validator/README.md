@@ -4,7 +4,7 @@ A `gradle` project which validates Lisp code parenthesis are enclosed
 
 ## Available Scripts
 
-Script must run from root parent project [availity-assignment](../)
+Script must run from root parent project [availity-assignment](../README.md)
 
 ### `./gradlew test` or `./gradlew :lisp-parenthesis-validator:test`
 

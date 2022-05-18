@@ -5,6 +5,8 @@ the request id into a modal window.
 
 ## Available Scripts
 
+Set `REACT_APP_AWS_API_GATEWAY_ENDPOINT` environment variable to set your aws api gateway post endpoint before you run any scripts
+For test you can change `env.test` file accordingly. Sample for test is already provided if you don't want to create one
 In the project directory, you can run:
 
 ### `npm start`
@@ -29,7 +31,7 @@ Your app is ready to be deployed!
 
 ## If you prefer gradle tasks
 
-Script must run from root parent project [availity-assignment](..)
+Script must run from root parent project [availity-assignment](../README.md)
 
 ### `./gradlew test` or `./gradlew :registration-user-interface:test`
 
