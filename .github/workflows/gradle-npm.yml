@@ -32,7 +32,7 @@ jobs:
           cd ../
 
       - name: Run Gradle and npm tests
-        run: ./gradlew test
+        run: ./gradlew test --no-daemon
 
       - name: Generate JaCoCo coverage report for project `lisp-parenthesis-validator`
         id: jacocoCoverageLispParenthesisValidator
@@ -79,7 +79,7 @@ jobs:
           fi
 
       - name: Run React production build
-        run: ./gradlew bundle
+        run: ./gradlew bundle --no-daemon
         env:
           REACT_APP_AWS_API_GATEWAY_ENDPOINT: ${{ secrets.AWS_API_GATEWAY_ENDPOINT }}
 
