@@ -269,6 +269,9 @@ const expectRegisterButton = (disabled: boolean = false) => {
     expectRequired(registerButton, 'Register')
 };
 
+/**
+ * Renders root with registration form
+ */
 const renderRoot = ()  => {
     root = ReactDOM.createRoot(container!);
     root.render(<RegistrationForm/>);
@@ -279,7 +282,7 @@ const renderRoot = ()  => {
  * Expects the given callback to be captured into act
  * @param callback a callback to be run inside act callback
  */
-const expectAct = (callback: () => void | undefined = renderRoot) => {
+const expectAct = (callback: () => void = renderRoot) => {
     act(callback);
     expect(container).toBeTruthy();
 };
