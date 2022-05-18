@@ -1,6 +1,7 @@
 package com.prakashkhadka.validator;
 
 import java.util.Stack;
+import java.util.function.Supplier;
 
 /**
  * Validator for Lisp code parenthesis
@@ -9,7 +10,10 @@ import java.util.Stack;
  * Created on: May 10, 2022
  */
 public class LispParenthesisValidator {
-    private static final LispParenthesisValidator VALIDATOR = new LispParenthesisValidator();
+    // Supplier in Java are lazy. Thus, this is lazy singleton instance of validator
+    // Note, this is not a thread safe singleton
+    private static final Supplier<LispParenthesisValidator> VALIDATOR = LispParenthesisValidator::new;
+
     private static final char START_PARENTHESIS = '(';
     private static final char END_PARENTHESIS = ')';
     private static final char SINGLE_LINE_COMMENT = ';';
@@ -17,10 +21,6 @@ public class LispParenthesisValidator {
     private static final char NEW_LINE = '\n';
     private static final char MULTI_LINE_COMMENT_SHARP = '#';
     private static final char MULTI_LINE_COMMENT_PIPE = '|';
-
-    private LispParenthesisValidator() {
-        // private instantiation
-    }
 
     /**
      * Validates the given Lisp expression if parenthesis is complete and enclosed
@@ -31,7 +31,11 @@ public class LispParenthesisValidator {
      * otherwise {@code false}
      */
     public static boolean validate(String expression) {
-        return VALIDATOR.test(expression);
+        return VALIDATOR.get().test(expression);
+    }
+
+    private LispParenthesisValidator() {
+        // private instantiation
     }
 
     /**
