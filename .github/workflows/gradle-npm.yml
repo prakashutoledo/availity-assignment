@@ -26,10 +26,10 @@ jobs:
           cache-dependency-path: ./registration-user-interface/package-lock.json
 
       - name: 'Install npm dependencies'
-        run:  (cd -- ./registration-user-interface && npm install)
+        run:  ./gradlew npmInstall
 
       - name: Run Gradle and npm tests
-        run: ./gradlew test --no-daemon
+        run: ./gradlew test
 
       - name: Generate JaCoCo coverage report for project `lisp-parenthesis-validator`
         id: jacocoCoverageLispParenthesisValidator
@@ -76,7 +76,7 @@ jobs:
           fi
 
       - name: Run React production build
-        run: ./gradlew bundle --no-daemon
+        run: ./gradlew bundle
         env:
           REACT_APP_AWS_API_GATEWAY_ENDPOINT: ${{ secrets.AWS_API_GATEWAY_ENDPOINT }}
 
