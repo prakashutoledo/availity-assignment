@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A CSV file format enrollment processor for {@link Enrollee}
@@ -33,7 +34,9 @@ import java.util.Map;
  * Created on: May 11, 2022
  */
 public class CsvEnrollmentProcessor {
-    private static final CsvEnrollmentProcessor CSV_ENROLLMENT_PROCESSOR = new CsvEnrollmentProcessor();
+    // Supplier in Java are lazy. Thus, this is lazy singleton instance of enrollment processor
+    // Note, this is not a thread safe singleton
+    private static final Supplier<CsvEnrollmentProcessor> CSV_ENROLLMENT_PROCESSOR = CsvEnrollmentProcessor::new;
 
     private static final CsvMapper CSV_MAPPER = new CsvMapper();
     private static final CsvSchema DEFAULT_SCHEMA = CSV_MAPPER.schemaFor(Enrollee.class).withHeader();
@@ -49,7 +52,7 @@ public class CsvEnrollmentProcessor {
      * @param filePath A csv file path to process
      */
     public static void processFile(String filePath) {
-        CSV_ENROLLMENT_PROCESSOR.process(filePath);
+        CSV_ENROLLMENT_PROCESSOR.get().process(filePath);
     }
 
     /**
@@ -58,7 +61,7 @@ public class CsvEnrollmentProcessor {
      * @param filePath a csv {@link Path} to process
      */
     public static void processFile(Path filePath) {
-        CSV_ENROLLMENT_PROCESSOR.process(filePath);
+        CSV_ENROLLMENT_PROCESSOR.get().process(filePath);
     }
 
     /**
