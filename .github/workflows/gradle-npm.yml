@@ -25,6 +25,7 @@ jobs:
           node-version: '16.15.0'
           cache: 'npm'
           cache-dependency-path: ./registration-user-interface/package-lock.json
+        run: (cd ./registration-user-interface && npm install -g npm)
 
       - name: 'Install npm dependencies'
         if: steps.setUpNode.outputs.cache-hit != 'true'
