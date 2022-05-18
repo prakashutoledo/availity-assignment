@@ -1,13 +1,14 @@
 import {act} from "react-dom/test-utils";
 import React from "react";
 import {fireEvent, waitFor} from "@testing-library/react";
-import ReactDOM from "react-dom/client";
-import MockAdapter from "axios-mock-adapter";
+import ReactDOM, {Root} from "react-dom/client";
+import MockAdapter, {RequestHandler} from "axios-mock-adapter";
 
 import {RegistrationForm} from "./registration-form";
 import axios from "axios";
 
-let container: HTMLElement | null = null;
+let root: Root;
+let container: HTMLElement;
 
 beforeEach(() => {
     container = document.createElement('div');
@@ -16,8 +17,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    document.body.removeChild(container!);
-    container = null;
+    expectAct(() => root.unmount());
+    container.remove();
 });
 
 describe('Should rendered basic html element', () => {
@@ -97,6 +98,7 @@ describe('Validating text input fields', () => {
 describe('Should validate register button', () => {
     let mockAxios: MockAdapter;
     const apiGatewayEndpoint: string = 'https://some-fake-api'
+
     beforeAll(() => mockAxios = new MockAdapter(axios))
 
     afterEach(() => mockAxios.reset())
@@ -114,27 +116,13 @@ describe('Should validate register button', () => {
         expectRegisterButton()
     })
 
-    it('Should submit aws api gateway request with success request id description', async () => {
-        // Mock actual request
-        mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id"});
-        // Should open dialog
-        await expectDialog('fake-request-id')
-
-        // Wait for dialog close by invoking close icon
-        await act(async () => {
-            fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
-        });
-    });
-
-    it('Should submit aws api gateway request with dialog network error description', async () => {
-        mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce()
-        // Should open dialog
-        await expectDialog('Unable to post registration')
-
-        // Wait for dialog close by invoking close icon
-        await act(async () => {
-            fireEvent.click(expectSelector('#apigateway-request-dialog-close')!)
-        });
+    it.each`
+        dialogDescription                | handlerCallback
+        ${'fake-request-id'}             | ${(handler: RequestHandler) => handler.reply(200, {requestId: 'fake-request-id'})}
+        ${'Unable to post registration'} | ${(handler: RequestHandler) => handler.networkErrorOnce()}
+    `('Should open dialog box with description $dialogDescription', async ({dialogDescription, handlerCallback}) => {
+        handlerCallback(mockAxios.onPost(apiGatewayEndpoint));
+        await expectDialog(dialogDescription);
     });
 
     it('Should close dialog and empty all the inputs on close icon clicked event', async () => {
@@ -282,11 +270,19 @@ const expectRegisterButton = (disabled: boolean = false) => {
 };
 
 /**
+ * Renders root with registration form
+ */
+const renderRoot = ()  => {
+    root = ReactDOM.createRoot(container!);
+    root.render(<RegistrationForm/>);
+}
+
+
+/**
  * Expects the given callback to be captured into act
  * @param callback a callback to be run inside act callback
  */
-const expectAct = (callback: () => void | undefined = () => ReactDOM.createRoot(container!)?.render(
-    <RegistrationForm/>)) => {
+const expectAct = (callback: () => void = renderRoot) => {
     act(callback);
     expect(container).toBeTruthy();
 };
@@ -306,7 +302,7 @@ const expectSelectFocus = (textInputId: string, checkFocus: boolean = false) => 
         expectAct(() => input?.focus());
         expect(input).toHaveFocus();
         expectErrorText(textInputId);
-        let errorText = container?.querySelector(`#${textInputId}-helper-text`);
+        let errorText = container.querySelector(`#${textInputId}-helper-text`);
         expect(errorText).toBeNull();
     }
     return input;
@@ -319,7 +315,7 @@ const expectSelectFocus = (textInputId: string, checkFocus: boolean = false) => 
  * @param error an error to match inner html for given helper text
  */
 const expectErrorText = (textInputId: string, error: string | null = null) => {
-    const errorText = container?.querySelector(`#${textInputId}-helper-text`);
+    const errorText = container.querySelector(`#${textInputId}-helper-text`);
     if (!error) {
         expect(errorText).toBeNull();
     } else {

@@ -19,12 +19,13 @@ jobs:
           cache: 'gradle'
 
       - name: Set up Node
+        id: setUpNode
         uses: actions/setup-node@v3
         with:
           node-version: '16.15.0'
           cache: 'npm'
           cache-dependency-path: ./registration-user-interface/package-lock.json
-
+          
       - name: 'Install npm dependencies'
         run:  ./gradlew npmInstall
 
