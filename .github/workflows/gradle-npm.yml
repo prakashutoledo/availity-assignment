@@ -27,7 +27,7 @@ jobs:
           cache-dependency-path: ./registration-user-interface/package-lock.json
 
       - name: Set up npm
-        run: (cd ./registration-user-interface && npm install)
+        run: (cd ./registration-user-interface && npm install -g)
 
       - name: 'Install npm dependencies'
         if: steps.setUpNode.outputs.cache-hit != 'true'
