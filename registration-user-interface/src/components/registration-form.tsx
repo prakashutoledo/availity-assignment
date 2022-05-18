@@ -7,7 +7,7 @@ const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@
 const zipRegex = /^\d{5}(?:[-\s]\d{4})?$/;
 const max10DigitRegex = /[0-9]{10}/;
 
-export const apiGatewayEndpoint: any = process.env.REACT_APP_AWS_API_GATEWAY_ENDPOINT;
+const apiGatewayEndpoint: any = process.env.REACT_APP_AWS_API_GATEWAY_ENDPOINT;
 
 /**
  * Registration form using material ui design

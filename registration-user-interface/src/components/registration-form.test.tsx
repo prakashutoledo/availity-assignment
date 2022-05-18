@@ -4,7 +4,7 @@ import {fireEvent, waitFor} from "@testing-library/react";
 import ReactDOM from "react-dom/client";
 import MockAdapter from "axios-mock-adapter";
 
-import {apiGatewayEndpoint, RegistrationForm} from "./registration-form";
+import {RegistrationForm} from "./registration-form";
 import axios from "axios";
 
 let container: HTMLElement | null = null;
@@ -90,12 +90,13 @@ describe('Validating text input fields', () => {
             fireChangeEventWithValue(input, validText)
         })
         expectErrorText(textInputId)
-        expect(input?.getAttribute('value')).toBe(validText)
+        expect(input).toHaveValue(validText)
     });
 });
 
 describe('Should validate register button', () => {
     let mockAxios: MockAdapter;
+    const apiGatewayEndpoint: string = 'https://some-fake-api'
     beforeAll(() => mockAxios = new MockAdapter(axios))
 
     afterEach(() => mockAxios.reset())
@@ -113,7 +114,7 @@ describe('Should validate register button', () => {
         expectRegisterButton()
     })
 
-    it('Should submit aws api gateway request with success request id description', async ()  => {
+    it('Should submit aws api gateway request with success request id description', async () => {
         // Mock actual request
         mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id"});
         // Should open dialog
@@ -125,7 +126,7 @@ describe('Should validate register button', () => {
         });
     });
 
-    it('Should submit aws api gateway request with dialog network error description', async ()  => {
+    it('Should submit aws api gateway request with dialog network error description', async () => {
         mockAxios.onPost(apiGatewayEndpoint).networkErrorOnce()
         // Should open dialog
         await expectDialog('Unable to post registration')
@@ -136,7 +137,7 @@ describe('Should validate register button', () => {
         });
     });
 
-    it('Should close dialog and empty all the inputs on close icon clicked event', async ()  => {
+    it('Should close dialog and empty all the inputs on close icon clicked event', async () => {
         mockAxios.onPost(apiGatewayEndpoint).reply(200, {requestId: "fake-request-id-2"});
         const submitButton = await expectDialog('fake-request-id-2')
 
@@ -157,7 +158,7 @@ describe('Should validate register button', () => {
      *
      * @param description a description of the modal
      */
-    const expectDialog =  async (description: string) => {
+    const expectDialog = async (description: string) => {
         const {submitButton} = expectVisibleButton(false);
 
         // Can't use expectAct here, as expectAct is synchronous process and will not wait for all state change event
@@ -274,8 +275,7 @@ const expectRegisterButton = (disabled: boolean = false) => {
     const registerButton = expectSelector('#submitRegistration')
     if (disabled) {
         expect(registerButton).toBeDisabled()
-    }
-    else {
+    } else {
         expect(registerButton).not.toBeDisabled()
     }
     expectRequired(registerButton, 'Register')
@@ -285,10 +285,9 @@ const expectRegisterButton = (disabled: boolean = false) => {
  * Expects the given callback to be captured into act
  * @param callback a callback to be run inside act callback
  */
-const expectAct = (callback: () => void | undefined = () => ReactDOM.createRoot(container!)?.render(<RegistrationForm />)) => {
-    act(() => {
-        callback()
-    });
+const expectAct = (callback: () => void | undefined = () => ReactDOM.createRoot(container!)?.render(
+    <RegistrationForm/>)) => {
+    act(callback);
     expect(container).toBeTruthy();
 };
 
@@ -301,7 +300,7 @@ const expectAct = (callback: () => void | undefined = () => ReactDOM.createRoot(
  *
  * @returns the text field input with given id
  */
-const expectSelectFocus = (textInputId : string, checkFocus: boolean = false) => {
+const expectSelectFocus = (textInputId: string, checkFocus: boolean = false) => {
     const input = document.getElementById(textInputId);
     if (checkFocus) {
         expectAct(() => input?.focus());
@@ -323,8 +322,7 @@ const expectErrorText = (textInputId: string, error: string | null = null) => {
     const errorText = container?.querySelector(`#${textInputId}-helper-text`);
     if (!error) {
         expect(errorText).toBeNull();
-    }
-    else {
+    } else {
         expect(errorText?.innerHTML).toBe(error)
     }
 }
@@ -352,7 +350,6 @@ const fireChangeEventWithValue = (element: HTMLElement | null, value: string) =>
 const expectVisibleButton = (failOne: boolean) => {
     const submitButton = document.getElementById('submitRegistration')
     const textInputs = {...inputs()};
-    const zip = textInputs.zip;
 
     expectAct(() => {
         fireChangeEventWithValue(textInputs.firstName, "first name");
@@ -365,17 +362,17 @@ const expectVisibleButton = (failOne: boolean) => {
         fireChangeEventWithValue(textInputs.country, "Some country");
         fireChangeEventWithValue(textInputs.city, "Some city");
         fireChangeEventWithValue(textInputs.state, "Some state");
-        fireChangeEventWithValue(zip, failOne ? "4360" : "43607");
+        fireChangeEventWithValue(textInputs.zip, failOne ? "4360" : "43607");
     });
 
-    return { submitButton, zip }
+    return {submitButton, ['zip']: textInputs.zip}
 }
 
 /**
  * Expects all the text field input value to be empty string
  */
 const expectEmptyInputs = () => {
-    Object.entries(inputs()).forEach(([,input]) => {
+    Object.entries(inputs()).forEach(([, input]) => {
         expect(input).toHaveValue("")
     })
 }

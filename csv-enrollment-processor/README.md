@@ -2,7 +2,7 @@
 
 A `gradle` project which helps to process enrollment files in CSV format
 
-Script must run from root parent project [availity-assignment](..)
+Script must run from root parent project [availity-assignment](../README.md)
 
 ### `./gradlew test` or `./gradlew :csv-enrollment-processor:test`
 
