@@ -34,7 +34,7 @@ import java.util.function.Supplier;
  * Created on: May 11, 2022
  */
 public class CsvEnrollmentProcessor {
-    // Supplier in Java are lazy. Thus, this is lazy singleton stage
+    // Supplier in Java are lazy. Thus, this is lazy singleton instance of enrollment processor
     // Note, this is not a thread safe singleton
     private static final Supplier<CsvEnrollmentProcessor> CSV_ENROLLMENT_PROCESSOR = CsvEnrollmentProcessor::new;
 
