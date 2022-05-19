@@ -5,6 +5,11 @@ task bundle(type: NpmTask){
     args = ['run', 'build']
 }
 
+task npmCi(type: NpmTask) {
+    description 'Runs `npm ci'
+    args = ['ci']
+}
+
 assemble {
     enabled  = false
 }
